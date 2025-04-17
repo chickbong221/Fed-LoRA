@@ -1,3 +1,4 @@
+seed: 123
 use_gpu: True
 device: 0
 early_stop:
