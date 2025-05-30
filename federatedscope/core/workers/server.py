@@ -248,7 +248,7 @@ class Server(BaseServer):
         To start the FL course, listen and handle messages (for distributed \
         mode).
         """
-
+        
         # Begin: Broadcast model parameters and start to FL train
         while self.join_in_client_num < self.client_num:
             msg = self.comm_manager.receive()

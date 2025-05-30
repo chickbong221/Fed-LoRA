@@ -25,9 +25,9 @@ def extend_evaluation_cfg(cfg):
     # wandb related options
     # ---------------------------------------------------------------------- #
     cfg.wandb = CN()
-    cfg.wandb.use = False
-    cfg.wandb.name_user = ''
-    cfg.wandb.name_project = ''
+    cfg.wandb.use = True
+    cfg.wandb.name_user = 'letuanhf-hanoi-university-of-science-and-technology'
+    cfg.wandb.name_project = 'Fed-LoRA'
     cfg.wandb.online_track = True
     cfg.wandb.client_train_info = False
 

@@ -1,0 +1,60 @@
+Metadata-Version: 2.1
+Name: federatedscope
+Version: 0.3.0
+Summary: Federated learning package
+Home-page: https://github.com/alibaba/FederatedScope
+Author: Alibaba Damo Academy
+Author-email: jones.wz@alibaba-inc.com
+License: Apache License 2.0
+Download-URL: https://github.com/alibaba/FederatedScope/archive/0.3.0.tar.gz
+Keywords: deep-learning,federated-learning,benchmark
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Provides-Extra: app
+Provides-Extra: dev
+Provides-Extra: full
+Provides-Extra: hpo
+Provides-Extra: htl
+Provides-Extra: llm
+Provides-Extra: org
+Provides-Extra: test
+
+# FedSA-LoRA
+
+The implementation of [Selective Aggregation for Low-Rank Adaptation in Federated Learning](https://openreview.net/forum?id=iX3uESGdsO) [ICLR 2025]. \
+[Pengxin Guo](https://pengxin-guo.github.io), [Shuang Zeng](https://scholar.google.com/citations?user=yTP1oqkAAAAJ&hl=en), Yanran Wang, Huijie Fan, Feifei Wang, and [Liangqiong Qu](https://liangqiong.github.io).
+
+<img src="./figs/FedSA-LoRA.png" alt="framework" width="700" /> 
+
+##### Figure 1. The illustration of (a) LoRA, (b) FFA-LoRA, and (c) FedSA-LoRA. In LoRA, both $A$ and $B$ matrices are trainable and shared with the server for aggregation. In FFA-LoRA, only $B$ matrices are trainable and shared with the server for aggregation, while $A$ matrices are fixed after initialization. In FedSA-LoRA, both $A$ and $B$ matrices are trainable, but only $A$ matrices are shared with the server for aggregation while $B$ matrices are kept locally.
+
+
+## Installation
+
+Our code is based on Python version 3.10 and PyTorch version 2.1.0. 
+You can install all the dependencies with the following command:
+```shell
+conda create -n fedsa-lora python=3.10
+conda activate fedsa-lora
+conda install pytorch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 pytorch-cuda=12.1 -c pytorch -c nvidia
+pip install -e .[llm]
+```
+
+## Training
+
+Now, we can fine-tune a LLM with FedSA-LoRA:
+
+```shell
+python federatedscope/main.py --cfg federatedscope/glue/yamls/fedsa-lora.yaml
+```
+
+## Acknowledgement
+
+We would like to thank the authors for releasing the public repository: [FederatedScope-LLM](https://github.com/alibaba/FederatedScope/tree/llm).
+

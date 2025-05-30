@@ -1,0 +1,3 @@
+2025-05-27 11:46:27,047 (logging:132) INFO: the current machine is at 127.0.1.1
+2025-05-27 11:46:27,048 (logging:134) INFO: the current dir is /root/projects/FedSA-LoRA
+2025-05-27 11:46:27,048 (logging:135) INFO: the output dir is exp/FedAvg_meta-llama/Meta-Llama-3-8B@huggingface_llm_on_gsm8k@llm_lr0.005_lstep30

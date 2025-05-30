@@ -162,6 +162,7 @@ def init_wandb(cfg):
     tmp_cfg.de_arguments()
     cfg_yaml = yaml.safe_load(tmp_cfg.dump())
 
+    wandb.login(key="b1d6eed8871c7668a889ae74a621b5dbd2f3b070")
     wandb.init(project=cfg.wandb.name_project,
                entity=cfg.wandb.name_user,
                config=cfg_yaml,

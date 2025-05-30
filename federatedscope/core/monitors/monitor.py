@@ -53,6 +53,8 @@ class Monitor(object):
         self.cfg = cfg
         self.log_res_best = {}
         self.outdir = cfg.outdir
+        # for i in range(10):
+        #     logger.info(cfg.wandb.use)
         self.use_wandb = cfg.wandb.use
         self.wandb_online_track = cfg.wandb.online_track if cfg.wandb.use \
             else False
