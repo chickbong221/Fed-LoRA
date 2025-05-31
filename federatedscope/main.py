@@ -24,7 +24,6 @@ if os.environ.get('http_proxy'):
 
 if __name__ == '__main__':
     init_cfg = global_cfg.clone()
-    print(f"ahihi {init_cfg.wandb.use}")
     args = parse_args()
     if args.cfg_file:
         init_cfg.merge_from_file(args.cfg_file)

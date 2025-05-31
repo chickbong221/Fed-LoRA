@@ -222,7 +222,8 @@ def logline_2_wandb_dict(exp_stop_normal, line, log_res_best, raw_out):
         # 36, 'val_avg_loss': 3.693923234939575, 'val_correct': 4.0,
         # 'val_acc': 0.1111111111111111}}
         line = line.replace("Find new best result: ", "").replace("\'", "\"")
-        res = json.loads(s=line)
+        line = line.replace('nan', 'null')
+        res = json.loads(line)
         for best_type_key, val in res.items():
             for inner_key, inner_val in val.items():
                 log_res_best[f"best_{best_type_key}/{inner_key}"] = inner_val
@@ -231,7 +232,10 @@ def logline_2_wandb_dict(exp_stop_normal, line, log_res_best, raw_out):
         if raw_out:
             line = line.split("INFO: ")[1]
         res = line.replace("\'", "\"")
-        res = json.loads(s=res)
+        res = res.replace('nan', 'null')
+        for i in range(1):
+            logger.info(f"Trying to decode this string with json: {res}")
+        res = json.loads(res)
         # pre-process the roles
         cur_round = res['Round']
         if "Server" in res['Role']:

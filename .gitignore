@@ -1,5 +1,7 @@
 data
 models--FacebookAI--roberta-large
 figs
-# exp
 .env
+fedsa-lora_mnli-m.ckpt
+final_fedsa-lora_mnli-m.ckpt
+wandb

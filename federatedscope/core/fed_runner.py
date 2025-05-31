@@ -59,8 +59,6 @@ class BaseRunner(object):
         if not config.is_ready_for_run:
             config.ready_for_run()
         self.cfg = config
-        for i in range(10):
-            logger.info(self.cfg.wandb.use)
         self.client_cfgs = client_configs
         self.serial_num_for_msg = 0
 

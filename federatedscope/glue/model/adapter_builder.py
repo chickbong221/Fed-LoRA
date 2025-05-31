@@ -43,6 +43,13 @@ def enable_adapter(model, package, adapter, **kwargs):
             from peft import VeraConfig
             peft_config = VeraConfig(task_type=TaskType.SEQ_CLS, **kwargs)
             model = get_peft_model(model, peft_config)
+        # added by me, for rsLoRA
+        elif adapter == 'rslora':
+            for i in range(10):
+                print("Using RsLoRA adapter")
+            from peft import RsLoRAConfig
+            peft_config = RsLoRAConfig(task_type=TaskType.SEQ_CLS, **kwargs)
+            model = get_peft_model(model, peft_config)
         elif adapter == 'prefix':
             from peft import PrefixTuningConfig
             peft_config = PrefixTuningConfig(task_type=TaskType.SEQ_CLS,
