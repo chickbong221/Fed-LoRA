@@ -1,0 +1,841 @@
+2025-05-31 15:03:58,847 (logging:132) INFO: the current machine is at 127.0.1.1
+2025-05-31 15:03:58,847 (logging:134) INFO: the current dir is /root/projects/Fed-LoRA
+2025-05-31 15:03:58,847 (logging:135) INFO: the output dir is exp/FedAvg_FacebookAI/roberta-large@huggingface_llm_on_mnli@glue_lr0.02_lstep10/sub_exp_20250531150358
+2025-05-31 15:05:56,347 (base_translator:120) WARNING: Cannot access train label distribution for splitter, split dataset without considering train label.
+2025-05-31 15:05:57,771 (config:243) INFO: the used configs are: 
+adapter:
+  use: False
+aggregator:
+  BFT_args:
+    
+  byzantine_node_num: 0
+  inside_weight: 1.0
+  num_agg_groups: 1
+  num_agg_topk: []
+  outside_weight: 0.0
+  robust_rule: fedavg
+asyn:
+  use: False
+attack:
+  alpha_TV: 0.001
+  alpha_prop_loss: 0
+  attack_method: 
+  attacker_id: -1
+  classifier_PIA: randomforest
+  edge_num: 100
+  edge_path: edge_data/
+  freq: 10
+  info_diff_type: l2
+  inject_round: 0
+  insert_round: 100000
+  label_type: dirty
+  max_ite: 400
+  mean: [0.9637]
+  mia_is_simulate_in: False
+  mia_simulate_in_round: 20
+  pgd_eps: 2
+  pgd_lr: 0.1
+  pgd_poisoning: False
+  poison_ratio: 0.5
+  reconstruct_lr: 0.01
+  reconstruct_optim: Adam
+  scale_para: 1.0
+  scale_poisoning: False
+  self_epoch: 6
+  self_lr: 0.05
+  self_opt: False
+  setting: fix
+  std: [0.1592]
+  target_label_ind: -1
+  trigger_path: trigger/
+  trigger_type: edge
+backend: torch
+cfg_file: 
+check_completeness: False
+criterion:
+  type: CrossEntropyLoss
+data:
+  args: []
+  batch_size: 64
+  cSBM_phi: [0.5, 0.5, 0.5]
+  cache_dir: 
+  consistent_label_distribution: True
+  drop_last: False
+  file_path: 
+  hetero_data_name: []
+  hetero_synth_batch_size: 32
+  hetero_synth_feat_dim: 128
+  hetero_synth_prim_weight: 0.5
+  is_debug: False
+  label_list: ['entailment', 'neutral', 'contradiction']
+  loader: 
+  matched: True
+  max_query_len: 128
+  max_seq_len: 384
+  max_tgt_len: 128
+  num_contrast: 0
+  num_labels: 3
+  num_of_client_for_data: []
+  num_steps: 30
+  num_workers: 0
+  pre_transform: []
+  quadratic:
+    dim: 1
+    max_curv: 12.5
+    min_curv: 0.02
+  root: data/
+  save_data: False
+  server_holds_all: False
+  shuffle: True
+  sizes: [10, 5]
+  splits: [0.8, 0.1, 0.1]
+  splitter: lda
+  splitter_args: [{'alpha': 0.5}]
+  subsample: 1.0
+  target_transform: []
+  test_pre_transform: []
+  test_target_transform: []
+  test_transform: []
+  transform: []
+  trunc_stride: 128
+  type: mnli@glue
+  val_pre_transform: []
+  val_target_transform: []
+  val_transform: []
+  walk_length: 2
+dataloader:
+  batch_size: 128
+  drop_last: False
+  num_steps: 30
+  num_workers: 0
+  pin_memory: False
+  shuffle: True
+  sizes: [10, 5]
+  theta: -1
+  type: base
+  walk_length: 2
+device: 0
+distribute:
+  use: False
+early_stop:
+  delta: 0.0
+  improve_indicator_mode: best
+  patience: 0
+eval:
+  best_res_update_round_wise_key: val_accuracy
+  count_flops: False
+  freq: 1
+  metrics: ['accuracy']
+  monitoring: []
+  report: ['weighted_avg', 'avg', 'fairness', 'raw']
+  split: ['test', 'val']
+eval_device: -1
+expname: FedAvg_FacebookAI/roberta-large@huggingface_llm_on_mnli@glue_lr0.02_lstep10
+expname_tag: 
+feat_engr:
+  num_bins: 5
+  scenario: hfl
+  secure:
+    dp:
+      
+    encrypt:
+      type: dummy
+    key_size: 3072
+    type: encrypt
+  selec_threshold: 0.05
+  selec_woe_binning: quantile
+  type: 
+federate:
+  atc_load_from: 
+  atc_vanilla: False
+  client_idx_for_local_train: 0
+  client_num: 3
+  data_weighted_aggr: False
+  freeze_A: False
+  ignore_weight: False
+  join_in_info: []
+  make_global_eval: False
+  master_addr: 127.0.0.1
+  master_port: 29500
+  merge_test_data: False
+  merge_val_data: False
+  method: FedAvg
+  mode: standalone
+  online_aggr: False
+  process_num: 1
+  resource_info_file: 
+  restore_from: 
+  sample_client_num: 3
+  sample_client_rate: -1.0
+  sampler: uniform
+  save_client_model: False
+  save_freq: -1
+  save_to: fedsa-lora_mnli-m.ckpt
+  share_local_model: True
+  total_round_num: 1000
+  unseen_clients_rate: 0.0
+  use_diff: False
+  use_ss: False
+fedopt:
+  use: False
+fedprox:
+  use: False
+fedsageplus:
+  a: 1.0
+  b: 1.0
+  c: 1.0
+  fedgen_epoch: 200
+  gen_hidden: 128
+  hide_portion: 0.5
+  loc_epoch: 1
+  num_pred: 5
+fedswa:
+  use: False
+finetune:
+  batch_or_epoch: epoch
+  before_eval: False
+  epoch_linear: 10
+  freeze_param: 
+  local_param: []
+  local_update_steps: 1
+  lr_linear: 0.005
+  optimizer:
+    lr: 0.1
+    type: SGD
+  scheduler:
+    type: 
+    warmup_ratio: 0.0
+  simple_tuning: False
+  weight_decay: 0.0
+flitplus:
+  factor_ema: 0.8
+  lambdavat: 0.5
+  tmpFed: 0.5
+  weightReg: 1.0
+gcflplus:
+  EPS_1: 0.05
+  EPS_2: 0.1
+  seq_length: 5
+  standardize: False
+grad:
+  grad_accum_count: 1
+  grad_clip: -1.0
+hpo:
+  fedex:
+    cutoff: 0.0
+    diff: False
+    eta0: -1.0
+    flatten_ss: True
+    gamma: 0.0
+    pi_lr: 0.01
+    psn: False
+    sched: auto
+    ss: 
+    use: False
+  fts:
+    M: 100
+    M_target: 200
+    allow_load_existing_info: True
+    diff: False
+    fed_bo_max_iter: 50
+    g_var: 1e-06
+    gp_opt_schedule: 1
+    local_bo_epochs: 50
+    local_bo_max_iter: 50
+    ls: 1.0
+    obs_noise: 1e-06
+    ss: 
+    target_clients: []
+    use: False
+    v_kernel: 1.0
+    var: 0.1
+  init_cand_num: 16
+  larger_better: False
+  metric: client_summarized_weighted_avg.val_loss
+  num_workers: 0
+  pbt:
+    max_stage: 5
+    perf_threshold: 0.1
+  pfedhpo:
+    discrete: False
+    ss: 
+    target_fl_total_round: 1000
+    train_anchor: False
+    train_fl: False
+    use: False
+  scheduler: rs
+  sha:
+    budgets: []
+    elim_rate: 3
+    iter: 0
+  ss: 
+  table:
+    eps: 0.1
+    idx: 0
+    num: 27
+  trial_index: 0
+  working_folder: hpo
+llm:
+  adapter:
+    args: [{'adapter_package': 'peft', 'adapter_method': 'rslora', 'r': 8, 'lora_alpha': 16, 'lora_dropout': 0.05, 'use_rslora': True}]
+    mv_to_cpu: False
+    use: True
+  cache:
+    model: 
+  chat:
+    max_history_len: 10
+    max_len: 100
+  deepspeed:
+    ds_config: 
+    use: False
+  offsite_tuning:
+    emu_align:
+      data:
+        root: data
+        splits: [0.8, 0.1, 0.1]
+        type: alpaca@llm
+      exit_after_align: False
+      restore_from: 
+      save_to: 
+      train:
+        batch_or_epoch: batch
+        kd_loss_weight: 0.9
+        lm_loss_weight: 0.1
+        local_update_steps: 10
+        optimizer:
+          lr: 0.01
+          type: SGD
+      use: False
+    emu_l: 1
+    emu_r: 10
+    eval_type: emu
+    kwargs: [{}]
+    strategy: drop_layer
+    use: False
+  retry_on_nan_loss: False
+  tok_len: 128
+model:
+  contrast_temp: 1.0
+  contrast_topk: 100
+  downstream_tasks: []
+  dropout: 0.5
+  embed_size: 8
+  gamma: 0
+  graph_pooling: mean
+  hidden: 256
+  in_channels: 0
+  input_shape: ()
+  label_smoothing: 0.1
+  lambda_: 0.1
+  layer: 2
+  length_penalty: 2.0
+  max_answer_len: 30
+  max_length: 200
+  max_tree_depth: 3
+  min_length: 1
+  model_num_per_trainer: 1
+  model_type: google/bert_uncased_L-2_H-128_A-2
+  n_best_size: 20
+  no_repeat_ngram_size: 3
+  null_score_diff_threshold: 0.0
+  num_beams: 5
+  num_item: 0
+  num_labels: 1
+  num_of_trees: 10
+  num_user: 0
+  out_channels: 1
+  pretrain_tasks: []
+  stage: 
+  task: node
+  type: FacebookAI/roberta-large@huggingface_llm
+  use_bias: True
+  use_contrastive_loss: False
+nbafl:
+  use: False
+outdir: exp/FedAvg_FacebookAI/roberta-large@huggingface_llm_on_mnli@glue_lr0.02_lstep10/sub_exp_20250531150358
+personalization:
+  K: 5
+  beta: 1.0
+  epoch_feature: 1
+  epoch_linear: 2
+  local_param: ['lora_B', 'classifier']
+  local_update_steps: 10
+  lr: 0.02
+  lr_feature: 0.1
+  lr_linear: 0.1
+  regular_weight: 0.1
+  share_non_trainable_para: False
+  weight_decay: 0.0
+print_decimal_digits: 6
+quantization:
+  method: none
+  nbits: 8
+regularizer:
+  mu: 0.0
+  type: 
+seed: 123
+sgdmf:
+  use: False
+train:
+  batch_or_epoch: batch
+  data_para_dids: []
+  is_enable_half: True
+  local_update_steps: 10
+  optimizer:
+    lr: 0.02
+    type: SGD
+  scheduler:
+    type: 
+    warmup_ratio: 0.0
+  vera:
+    lr_c: 0.01
+trainer:
+  disp_freq: 50
+  local_entropy:
+    alpha: 0.75
+    eps: 0.0001
+    gamma: 0.03
+    inc_factor: 1.0
+  sam:
+    adaptive: False
+    eta: 0.0
+    rho: 1.0
+  type: gluetrainer
+  val_freq: 100000000
+use_gpu: True
+verbose: 1
+vertical:
+  use: False
+wandb:
+  client_train_info: False
+  name_project: Fed-LoRA
+  name_user: letuanhf-hanoi-university-of-science-and-technology
+  online_track: True
+  use: True
+2025-05-31 15:05:57,790 (utils:167) INFO: The device information file is not provided
+2025-05-31 15:05:57,790 (model_builder:137) WARNING: The input shape is None. Please specify the `data.input_shape`(a tuple) or give the representative data to `get_model` if necessary
+2025-05-31 15:05:58,888 (fed_runner:178) INFO: Server has been set up ... 
+2025-05-31 15:05:59,401 (fed_runner:228) INFO: Client 1 has been set up ... 
+2025-05-31 15:05:59,847 (fed_runner:228) INFO: Client 2 has been set up ... 
+2025-05-31 15:06:00,367 (fed_runner:228) INFO: Client 3 has been set up ... 
+2025-05-31 15:06:00,367 (trainer:343) INFO: Model meta-info: <class 'federatedscope.glue.model.adapter_builder.AdapterModel'>.
+2025-05-31 15:06:00,373 (trainer:351) INFO: Num of original para names: 100.
+2025-05-31 15:06:00,373 (trainer:352) INFO: Num of original trainable para names: 493.
+2025-05-31 15:06:00,373 (trainer:354) INFO: Num of preserved para names in local update: 48. 
+Preserved para names in local update: {'base_model.model.roberta.encoder.layer.1.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.5.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.7.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.15.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.1.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.3.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.9.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.21.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.4.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.23.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.16.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.18.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.10.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.12.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.5.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.14.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.22.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.9.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.20.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.17.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.10.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.15.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.2.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.19.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.6.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.23.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.16.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.22.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.8.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.11.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.11.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.7.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.2.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.8.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.20.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.19.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.13.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.17.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.3.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.0.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.0.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.13.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.14.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.6.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.4.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.12.attention.self.query.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.18.attention.self.value.lora_A.default.weight', 'base_model.model.roberta.encoder.layer.21.attention.self.value.lora_A.default.weight'}.
+2025-05-31 15:06:00,373 (trainer:358) INFO: Num of filtered para names in local update: 52. 
+Filtered para names in local update: {'base_model.model.roberta.encoder.layer.6.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.15.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.8.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.4.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.16.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.15.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.2.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.12.attention.self.value.lora_B.default.weight', 'base_model.model.classifier.modules_to_save.default.out_proj.bias', 'base_model.model.roberta.encoder.layer.3.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.0.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.21.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.1.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.5.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.1.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.7.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.2.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.13.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.17.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.19.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.4.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.21.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.22.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.12.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.22.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.11.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.8.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.18.attention.self.query.lora_B.default.weight', 'base_model.model.classifier.modules_to_save.default.dense.weight', 'base_model.model.roberta.encoder.layer.20.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.19.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.10.attention.self.value.lora_B.default.weight', 'base_model.model.classifier.modules_to_save.default.dense.bias', 'base_model.model.roberta.encoder.layer.14.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.14.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.9.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.13.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.20.attention.self.value.lora_B.default.weight', 'base_model.model.classifier.modules_to_save.default.out_proj.weight', 'base_model.model.roberta.encoder.layer.18.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.6.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.10.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.7.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.3.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.5.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.11.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.23.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.16.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.23.attention.self.query.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.17.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.0.attention.self.value.lora_B.default.weight', 'base_model.model.roberta.encoder.layer.9.attention.self.value.lora_B.default.weight'}.
+2025-05-31 15:06:00,374 (trainer:363) INFO: After register default hooks,
+	the hooks_in_train is:
+	{
+	  "on_fit_start": [
+	    "_hook_on_fit_start_numerical_precision",
+	    "_hook_on_data_parallel_init",
+	    "_hook_on_fit_start_init",
+	    "_hook_on_fit_start_calculate_model_size"
+	  ],
+	  "on_epoch_start": [
+	    "_hook_on_epoch_start"
+	  ],
+	  "on_batch_start": [
+	    "_hook_on_batch_start_init"
+	  ],
+	  "on_batch_forward": [
+	    "_hook_on_batch_forward",
+	    "_hook_on_batch_forward_regularizer",
+	    "_hook_on_batch_forward_flop_count"
+	  ],
+	  "on_batch_backward": [
+	    "_hook_on_batch_backward"
+	  ],
+	  "on_batch_end": [
+	    "_hook_on_batch_end"
+	  ],
+	  "on_fit_end": [
+	    "_hook_on_fit_end"
+	  ]
+	};
+	the hooks_in_eval is:
+            t{
+	  "on_fit_start": [
+	    "_hook_on_fit_start_numerical_precision",
+	    "_hook_on_data_parallel_init",
+	    "_hook_on_fit_start_init"
+	  ],
+	  "on_epoch_start": [
+	    "_hook_on_epoch_start"
+	  ],
+	  "on_batch_start": [
+	    "_hook_on_batch_start_init"
+	  ],
+	  "on_batch_forward": [
+	    "_hook_on_batch_forward"
+	  ],
+	  "on_batch_end": [
+	    "_hook_on_batch_end"
+	  ],
+	  "on_fit_end": [
+	    "_hook_on_fit_end"
+	  ]
+	}
+2025-05-31 15:06:00,830 (server:881) INFO: ----------- Starting training (Round #0) -------------
+2025-05-31 15:06:04,774 (client:357) INFO: {'Role': 'Client #1', 'Round': 0, 'Results_raw': {'train_loss': 1922.8125, 'train_total': 1280, 'train_avg_loss': 1.502197, 'train_accuracy': 0.46875}}
+2025-05-31 15:06:11,474 (client:357) INFO: {'Role': 'Client #2', 'Round': 0, 'Results_raw': {'train_loss': 1903.75, 'train_total': 1280, 'train_avg_loss': 1.487305, 'train_accuracy': 0.45625}}
+2025-05-31 15:06:14,596 (client:357) INFO: {'Role': 'Client #3', 'Round': 0, 'Results_raw': {'train_loss': 1689.0625, 'train_total': 1280, 'train_avg_loss': 1.31958, 'train_accuracy': 0.489844}}
+2025-05-31 15:06:14,606 (server:344) INFO: Server: Starting evaluation at the end of round 0.
+2025-05-31 15:06:14,609 (server:350) INFO: ----------- Starting a new training round (Round #1) -------------
+2025-05-31 15:06:14,618 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:06:14,623 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:06:14,623 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:06:20,510 (client:554) INFO: {'Role': 'Client #1', 'Round': 0, 'Results_raw': {'val_loss': 8463.615234, 'val_total': 6550, 'val_avg_loss': 1.292155, 'val_accuracy': 0.528397}}
+2025-05-31 15:06:20,517 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:06:20,522 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:06:20,522 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:06:22,889 (client:554) INFO: {'Role': 'Client #2', 'Round': 0, 'Results_raw': {'val_loss': 5225.152344, 'val_total': 2154, 'val_avg_loss': 2.42579, 'val_accuracy': 0.0065}}
+2025-05-31 15:06:22,896 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:06:22,900 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:06:22,901 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:06:24,455 (client:554) INFO: {'Role': 'Client #3', 'Round': 0, 'Results_raw': {'val_loss': 4615.472656, 'val_total': 1111, 'val_avg_loss': 4.154341, 'val_accuracy': 0.0036}}
+2025-05-31 15:06:27,559 (client:357) INFO: {'Role': 'Client #2', 'Round': 1, 'Results_raw': {'train_loss': 1305.875, 'train_total': 1280, 'train_avg_loss': 1.020215, 'train_accuracy': 0.45}}
+2025-05-31 15:06:30,671 (client:357) INFO: {'Role': 'Client #1', 'Round': 1, 'Results_raw': {'train_loss': 1441.0625, 'train_total': 1280, 'train_avg_loss': 1.12583, 'train_accuracy': 0.467187}}
+2025-05-31 15:06:33,791 (client:357) INFO: {'Role': 'Client #3', 'Round': 1, 'Results_raw': {'train_loss': 1081.25, 'train_total': 1280, 'train_avg_loss': 0.844727, 'train_accuracy': 0.536719}}
+2025-05-31 15:06:33,808 (server:616) INFO: {'Role': 'Server #', 'Round': 0, 'Results_weighted_avg': {'val_loss': 7317.315135, 'val_total': 3271.666667, 'val_avg_loss': 1.864925, 'val_accuracy': 0.354457}, 'Results_avg': {'val_loss': 6101.413411, 'val_total': 3271.666667, 'val_avg_loss': 2.624095, 'val_accuracy': 0.179499}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 1688.771826, 'val_loss_bottom_decile': 4615.472656, 'val_loss_top_decile': 8463.615234, 'val_loss_min': 4615.472656, 'val_loss_max': 8463.615234, 'val_loss_bottom10%': nan, 'val_loss_top10%': 8463.615234, 'val_loss_cos1': 0.963765, 'val_loss_entropy': 1.061928, 'val_avg_loss_std': 1.176866, 'val_avg_loss_bottom_decile': 1.292155, 'val_avg_loss_top_decile': 4.154341, 'val_avg_loss_min': 1.292155, 'val_avg_loss_max': 4.154341, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 4.154341, 'val_avg_loss_cos1': 0.912438, 'val_avg_loss_entropy': 0.996664, 'val_accuracy_std': 0.246711, 'val_accuracy_bottom_decile': 0.0036, 'val_accuracy_top_decile': 0.528397, 'val_accuracy_min': 0.0036, 'val_accuracy_max': 0.528397, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.528397, 'val_accuracy_cos1': 0.588328, 'val_accuracy_entropy': 0.105373}}
+2025-05-31 15:06:33,809 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 0, "Results_weighted_avg": {"val_loss": 7317.315135, "val_total": 3271.666667, "val_avg_loss": 1.864925, "val_accuracy": 0.354457}, "Results_avg": {"val_loss": 6101.413411, "val_total": 3271.666667, "val_avg_loss": 2.624095, "val_accuracy": 0.179499}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 1688.771826, "val_loss_bottom_decile": 4615.472656, "val_loss_top_decile": 8463.615234, "val_loss_min": 4615.472656, "val_loss_max": 8463.615234, "val_loss_bottom10%": null, "val_loss_top10%": 8463.615234, "val_loss_cos1": 0.963765, "val_loss_entropy": 1.061928, "val_avg_loss_std": 1.176866, "val_avg_loss_bottom_decile": 1.292155, "val_avg_loss_top_decile": 4.154341, "val_avg_loss_min": 1.292155, "val_avg_loss_max": 4.154341, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 4.154341, "val_avg_loss_cos1": 0.912438, "val_avg_loss_entropy": 0.996664, "val_accuracy_std": 0.246711, "val_accuracy_bottom_decile": 0.0036, "val_accuracy_top_decile": 0.528397, "val_accuracy_min": 0.0036, "val_accuracy_max": 0.528397, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.528397, "val_accuracy_cos1": 0.588328, "val_accuracy_entropy": 0.105373}}
+
+2025-05-31 15:06:33,827 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '95.23K', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:06:33,827 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '27.56K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:06:33,837 (server:344) INFO: Server: Starting evaluation at the end of round 1.
+2025-05-31 15:06:33,841 (server:350) INFO: ----------- Starting a new training round (Round #2) -------------
+2025-05-31 15:06:33,850 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:06:33,855 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:06:33,855 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:06:39,695 (client:554) INFO: {'Role': 'Client #1', 'Round': 1, 'Results_raw': {'val_loss': 8264.947266, 'val_total': 6550, 'val_avg_loss': 1.261824, 'val_accuracy': 0.528397}}
+2025-05-31 15:06:39,701 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:06:39,706 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:06:39,706 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:06:42,068 (client:554) INFO: {'Role': 'Client #2', 'Round': 1, 'Results_raw': {'val_loss': 4702.621094, 'val_total': 2154, 'val_avg_loss': 2.183204, 'val_accuracy': 0.0065}}
+2025-05-31 15:06:42,075 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:06:42,080 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:06:42,080 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:06:52,228 (client:554) INFO: {'Role': 'Client #3', 'Round': 1, 'Results_raw': {'val_loss': 4256.765625, 'val_total': 1111, 'val_avg_loss': 3.831472, 'val_accuracy': 0.0036}}
+2025-05-31 15:06:55,554 (client:357) INFO: {'Role': 'Client #2', 'Round': 2, 'Results_raw': {'train_loss': 1305.8125, 'train_total': 1280, 'train_avg_loss': 1.020166, 'train_accuracy': 0.452344}}
+2025-05-31 15:06:58,698 (client:357) INFO: {'Role': 'Client #3', 'Round': 2, 'Results_raw': {'train_loss': 1121.5, 'train_total': 1280, 'train_avg_loss': 0.876172, 'train_accuracy': 0.576562}}
+2025-05-31 15:07:01,813 (client:357) INFO: {'Role': 'Client #1', 'Round': 2, 'Results_raw': {'train_loss': 1398.9375, 'train_total': 1280, 'train_avg_loss': 1.09292, 'train_accuracy': 0.478125}}
+2025-05-31 15:07:01,814 (server:616) INFO: {'Role': 'Server #', 'Round': 1, 'Results_weighted_avg': {'val_loss': 7029.456652, 'val_total': 3271.666667, 'val_avg_loss': 1.754899, 'val_accuracy': 0.354457}, 'Results_avg': {'val_loss': 5741.444661, 'val_total': 3271.666667, 'val_avg_loss': 2.4255, 'val_accuracy': 0.179499}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 1793.645416, 'val_loss_bottom_decile': 4256.765625, 'val_loss_top_decile': 8264.947266, 'val_loss_min': 4256.765625, 'val_loss_max': 8264.947266, 'val_loss_bottom10%': nan, 'val_loss_top10%': 8264.947266, 'val_loss_cos1': 0.954506, 'val_loss_entropy': 1.052236, 'val_avg_loss_std': 1.062953, 'val_avg_loss_bottom_decile': 1.261824, 'val_avg_loss_top_decile': 3.831472, 'val_avg_loss_min': 1.261824, 'val_avg_loss_max': 3.831472, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 3.831472, 'val_avg_loss_cos1': 0.915908, 'val_avg_loss_entropy': 1.002763, 'val_accuracy_std': 0.246711, 'val_accuracy_bottom_decile': 0.0036, 'val_accuracy_top_decile': 0.528397, 'val_accuracy_min': 0.0036, 'val_accuracy_max': 0.528397, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.528397, 'val_accuracy_cos1': 0.588328, 'val_accuracy_entropy': 0.105373}}
+2025-05-31 15:07:01,814 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 1, "Results_weighted_avg": {"val_loss": 7029.456652, "val_total": 3271.666667, "val_avg_loss": 1.754899, "val_accuracy": 0.354457}, "Results_avg": {"val_loss": 5741.444661, "val_total": 3271.666667, "val_avg_loss": 2.4255, "val_accuracy": 0.179499}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 1793.645416, "val_loss_bottom_decile": 4256.765625, "val_loss_top_decile": 8264.947266, "val_loss_min": 4256.765625, "val_loss_max": 8264.947266, "val_loss_bottom10%": null, "val_loss_top10%": 8264.947266, "val_loss_cos1": 0.954506, "val_loss_entropy": 1.052236, "val_avg_loss_std": 1.062953, "val_avg_loss_bottom_decile": 1.261824, "val_avg_loss_top_decile": 3.831472, "val_avg_loss_min": 1.261824, "val_avg_loss_max": 3.831472, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 3.831472, "val_avg_loss_cos1": 0.915908, "val_avg_loss_entropy": 1.002763, "val_accuracy_std": 0.246711, "val_accuracy_bottom_decile": 0.0036, "val_accuracy_top_decile": 0.528397, "val_accuracy_min": 0.0036, "val_accuracy_max": 0.528397, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.528397, "val_accuracy_cos1": 0.588328, "val_accuracy_entropy": 0.105373}}
+
+2025-05-31 15:07:01,815 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '162.8K', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:07:01,815 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '38.85K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:07:01,825 (server:344) INFO: Server: Starting evaluation at the end of round 2.
+2025-05-31 15:07:01,829 (server:350) INFO: ----------- Starting a new training round (Round #3) -------------
+2025-05-31 15:07:01,838 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:07:01,843 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:01,843 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:07,668 (client:554) INFO: {'Role': 'Client #1', 'Round': 2, 'Results_raw': {'val_loss': 7816.800781, 'val_total': 6550, 'val_avg_loss': 1.193405, 'val_accuracy': 0.528397}}
+2025-05-31 15:07:07,674 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:07:07,679 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:07,679 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:10,064 (client:554) INFO: {'Role': 'Client #2', 'Round': 2, 'Results_raw': {'val_loss': 3712.707031, 'val_total': 2154, 'val_avg_loss': 1.723634, 'val_accuracy': 0.0065}}
+2025-05-31 15:07:10,070 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:07:10,075 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:10,076 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:11,638 (client:554) INFO: {'Role': 'Client #3', 'Round': 2, 'Results_raw': {'val_loss': 1159.853516, 'val_total': 1111, 'val_avg_loss': 1.043973, 'val_accuracy': 0.0036}}
+2025-05-31 15:07:14,806 (client:357) INFO: {'Role': 'Client #1', 'Round': 3, 'Results_raw': {'train_loss': 1225.125, 'train_total': 1280, 'train_avg_loss': 0.957129, 'train_accuracy': 0.557031}}
+2025-05-31 15:07:17,963 (client:357) INFO: {'Role': 'Client #2', 'Round': 3, 'Results_raw': {'train_loss': 1122.8125, 'train_total': 1280, 'train_avg_loss': 0.877197, 'train_accuracy': 0.446875}}
+2025-05-31 15:07:24,649 (client:357) INFO: {'Role': 'Client #3', 'Round': 3, 'Results_raw': {'train_loss': 1163.375, 'train_total': 1280, 'train_avg_loss': 0.908887, 'train_accuracy': 0.5625}}
+2025-05-31 15:07:24,651 (server:616) INFO: {'Role': 'Server #', 'Round': 2, 'Results_weighted_avg': {'val_loss': 6162.589233, 'val_total': 3271.666667, 'val_avg_loss': 1.292854, 'val_accuracy': 0.354457}, 'Results_avg': {'val_loss': 4229.787109, 'val_total': 3271.666667, 'val_avg_loss': 1.320337, 'val_accuracy': 0.179499}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 2742.172567, 'val_loss_bottom_decile': 1159.853516, 'val_loss_top_decile': 7816.800781, 'val_loss_min': 1159.853516, 'val_loss_max': 7816.800781, 'val_loss_bottom10%': nan, 'val_loss_top10%': 7816.800781, 'val_loss_cos1': 0.839095, 'val_loss_entropy': 0.876718, 'val_avg_loss_std': 0.291626, 'val_avg_loss_bottom_decile': 1.043973, 'val_avg_loss_top_decile': 1.723634, 'val_avg_loss_min': 1.043973, 'val_avg_loss_max': 1.723634, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 1.723634, 'val_avg_loss_cos1': 0.976465, 'val_avg_loss_entropy': 1.074976, 'val_accuracy_std': 0.246711, 'val_accuracy_bottom_decile': 0.0036, 'val_accuracy_top_decile': 0.528397, 'val_accuracy_min': 0.0036, 'val_accuracy_max': 0.528397, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.528397, 'val_accuracy_cos1': 0.588328, 'val_accuracy_entropy': 0.105373}}
+2025-05-31 15:07:24,651 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 2, "Results_weighted_avg": {"val_loss": 6162.589233, "val_total": 3271.666667, "val_avg_loss": 1.292854, "val_accuracy": 0.354457}, "Results_avg": {"val_loss": 4229.787109, "val_total": 3271.666667, "val_avg_loss": 1.320337, "val_accuracy": 0.179499}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 2742.172567, "val_loss_bottom_decile": 1159.853516, "val_loss_top_decile": 7816.800781, "val_loss_min": 1159.853516, "val_loss_max": 7816.800781, "val_loss_bottom10%": null, "val_loss_top10%": 7816.800781, "val_loss_cos1": 0.839095, "val_loss_entropy": 0.876718, "val_avg_loss_std": 0.291626, "val_avg_loss_bottom_decile": 1.043973, "val_avg_loss_top_decile": 1.723634, "val_avg_loss_min": 1.043973, "val_avg_loss_max": 1.723634, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 1.723634, "val_avg_loss_cos1": 0.976465, "val_avg_loss_entropy": 1.074976, "val_accuracy_std": 0.246711, "val_accuracy_bottom_decile": 0.0036, "val_accuracy_top_decile": 0.528397, "val_accuracy_min": 0.0036, "val_accuracy_max": 0.528397, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.528397, "val_accuracy_cos1": 0.588328, "val_accuracy_entropy": 0.105373}}
+
+2025-05-31 15:07:24,652 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '230.38K', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:07:24,652 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '50.14K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:07:24,663 (server:344) INFO: Server: Starting evaluation at the end of round 3.
+2025-05-31 15:07:24,667 (server:350) INFO: ----------- Starting a new training round (Round #4) -------------
+2025-05-31 15:07:24,676 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:07:24,681 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:24,681 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:30,531 (client:554) INFO: {'Role': 'Client #1', 'Round': 3, 'Results_raw': {'val_loss': 8401.404297, 'val_total': 6550, 'val_avg_loss': 1.282657, 'val_accuracy': 0.296947}}
+2025-05-31 15:07:30,537 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:07:30,542 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:30,542 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:32,904 (client:554) INFO: {'Role': 'Client #2', 'Round': 3, 'Results_raw': {'val_loss': 4020.59375, 'val_total': 2154, 'val_avg_loss': 1.866571, 'val_accuracy': 0.538069}}
+2025-05-31 15:07:32,911 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:07:32,916 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:32,916 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:34,474 (client:554) INFO: {'Role': 'Client #3', 'Round': 3, 'Results_raw': {'val_loss': 3797.072266, 'val_total': 1111, 'val_avg_loss': 3.417707, 'val_accuracy': 0.017102}}
+2025-05-31 15:07:37,653 (client:357) INFO: {'Role': 'Client #1', 'Round': 4, 'Results_raw': {'train_loss': 1364.0625, 'train_total': 1280, 'train_avg_loss': 1.065674, 'train_accuracy': 0.490625}}
+2025-05-31 15:07:40,802 (client:357) INFO: {'Role': 'Client #2', 'Round': 4, 'Results_raw': {'train_loss': 1172.1875, 'train_total': 1280, 'train_avg_loss': 0.915771, 'train_accuracy': 0.460156}}
+2025-05-31 15:07:43,899 (client:357) INFO: {'Role': 'Client #3', 'Round': 4, 'Results_raw': {'train_loss': 1170.5, 'train_total': 1280, 'train_avg_loss': 0.914453, 'train_accuracy': 0.55}}
+2025-05-31 15:07:43,900 (server:616) INFO: {'Role': 'Server #', 'Round': 3, 'Results_weighted_avg': {'val_loss': 6918.808392, 'val_total': 3271.666667, 'val_avg_loss': 1.652478, 'val_accuracy': 0.318186}, 'Results_avg': {'val_loss': 5406.356771, 'val_total': 3271.666667, 'val_avg_loss': 2.188978, 'val_accuracy': 0.284039}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 2119.783436, 'val_loss_bottom_decile': 3797.072266, 'val_loss_top_decile': 8401.404297, 'val_loss_min': 3797.072266, 'val_loss_max': 8401.404297, 'val_loss_bottom10%': nan, 'val_loss_top10%': 8401.404297, 'val_loss_cos1': 0.930994, 'val_loss_entropy': 1.026402, 'val_avg_loss_std': 0.900951, 'val_avg_loss_bottom_decile': 1.282657, 'val_avg_loss_top_decile': 3.417707, 'val_avg_loss_min': 1.282657, 'val_avg_loss_max': 3.417707, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 3.417707, 'val_avg_loss_cos1': 0.924737, 'val_avg_loss_entropy': 1.016425, 'val_accuracy_std': 0.21288, 'val_accuracy_bottom_decile': 0.017102, 'val_accuracy_top_decile': 0.538069, 'val_accuracy_min': 0.017102, 'val_accuracy_max': 0.538069, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.538069, 'val_accuracy_cos1': 0.800202, 'val_accuracy_entropy': 0.736103}}
+2025-05-31 15:07:43,902 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 3, "Results_weighted_avg": {"val_loss": 6918.808392, "val_total": 3271.666667, "val_avg_loss": 1.652478, "val_accuracy": 0.318186}, "Results_avg": {"val_loss": 5406.356771, "val_total": 3271.666667, "val_avg_loss": 2.188978, "val_accuracy": 0.284039}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 2119.783436, "val_loss_bottom_decile": 3797.072266, "val_loss_top_decile": 8401.404297, "val_loss_min": 3797.072266, "val_loss_max": 8401.404297, "val_loss_bottom10%": null, "val_loss_top10%": 8401.404297, "val_loss_cos1": 0.930994, "val_loss_entropy": 1.026402, "val_avg_loss_std": 0.900951, "val_avg_loss_bottom_decile": 1.282657, "val_avg_loss_top_decile": 3.417707, "val_avg_loss_min": 1.282657, "val_avg_loss_max": 3.417707, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 3.417707, "val_avg_loss_cos1": 0.924737, "val_avg_loss_entropy": 1.016425, "val_accuracy_std": 0.21288, "val_accuracy_bottom_decile": 0.017102, "val_accuracy_top_decile": 0.538069, "val_accuracy_min": 0.017102, "val_accuracy_max": 0.538069, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.538069, "val_accuracy_cos1": 0.800202, "val_accuracy_entropy": 0.736103}}
+
+2025-05-31 15:07:43,904 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '297.96K', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:07:43,905 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '61.43K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:07:43,915 (server:344) INFO: Server: Starting evaluation at the end of round 4.
+2025-05-31 15:07:43,920 (server:350) INFO: ----------- Starting a new training round (Round #5) -------------
+2025-05-31 15:07:43,929 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:07:43,934 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:43,934 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:49,741 (client:554) INFO: {'Role': 'Client #1', 'Round': 4, 'Results_raw': {'val_loss': 8593.849609, 'val_total': 6550, 'val_avg_loss': 1.312038, 'val_accuracy': 0.296947}}
+2025-05-31 15:07:49,747 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:07:49,752 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:49,752 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:52,152 (client:554) INFO: {'Role': 'Client #2', 'Round': 4, 'Results_raw': {'val_loss': 3848.191406, 'val_total': 2154, 'val_avg_loss': 1.786533, 'val_accuracy': 0.538069}}
+2025-05-31 15:07:52,158 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:07:52,163 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:52,163 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:07:53,730 (client:554) INFO: {'Role': 'Client #3', 'Round': 4, 'Results_raw': {'val_loss': 3688.15625, 'val_total': 1111, 'val_avg_loss': 3.319673, 'val_accuracy': 0.017102}}
+2025-05-31 15:08:00,457 (client:357) INFO: {'Role': 'Client #3', 'Round': 5, 'Results_raw': {'train_loss': 919.8125, 'train_total': 1280, 'train_avg_loss': 0.718604, 'train_accuracy': 0.60625}}
+2025-05-31 15:08:03,590 (client:357) INFO: {'Role': 'Client #1', 'Round': 5, 'Results_raw': {'train_loss': 1429.3125, 'train_total': 1280, 'train_avg_loss': 1.11665, 'train_accuracy': 0.503125}}
+2025-05-31 15:08:06,721 (client:357) INFO: {'Role': 'Client #2', 'Round': 5, 'Results_raw': {'train_loss': 1167.9375, 'train_total': 1280, 'train_avg_loss': 0.912451, 'train_accuracy': 0.428125}}
+2025-05-31 15:08:06,722 (server:616) INFO: {'Role': 'Server #', 'Round': 4, 'Results_weighted_avg': {'val_loss': 6997.071913, 'val_total': 3271.666667, 'val_avg_loss': 1.643423, 'val_accuracy': 0.318186}, 'Results_avg': {'val_loss': 5376.732422, 'val_total': 3271.666667, 'val_avg_loss': 2.139414, 'val_accuracy': 0.284039}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 2275.783391, 'val_loss_bottom_decile': 3688.15625, 'val_loss_top_decile': 8593.849609, 'val_loss_min': 3688.15625, 'val_loss_max': 8593.849609, 'val_loss_bottom10%': nan, 'val_loss_top10%': 8593.849609, 'val_loss_cos1': 0.920905, 'val_loss_entropy': 1.014743, 'val_avg_loss_std': 0.856755, 'val_avg_loss_bottom_decile': 1.312038, 'val_avg_loss_top_decile': 3.319673, 'val_avg_loss_min': 1.312038, 'val_avg_loss_max': 3.319673, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 3.319673, 'val_avg_loss_cos1': 0.928329, 'val_avg_loss_entropy': 1.021505, 'val_accuracy_std': 0.21288, 'val_accuracy_bottom_decile': 0.017102, 'val_accuracy_top_decile': 0.538069, 'val_accuracy_min': 0.017102, 'val_accuracy_max': 0.538069, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.538069, 'val_accuracy_cos1': 0.800202, 'val_accuracy_entropy': 0.736103}}
+2025-05-31 15:08:06,722 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 4, "Results_weighted_avg": {"val_loss": 6997.071913, "val_total": 3271.666667, "val_avg_loss": 1.643423, "val_accuracy": 0.318186}, "Results_avg": {"val_loss": 5376.732422, "val_total": 3271.666667, "val_avg_loss": 2.139414, "val_accuracy": 0.284039}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 2275.783391, "val_loss_bottom_decile": 3688.15625, "val_loss_top_decile": 8593.849609, "val_loss_min": 3688.15625, "val_loss_max": 8593.849609, "val_loss_bottom10%": null, "val_loss_top10%": 8593.849609, "val_loss_cos1": 0.920905, "val_loss_entropy": 1.014743, "val_avg_loss_std": 0.856755, "val_avg_loss_bottom_decile": 1.312038, "val_avg_loss_top_decile": 3.319673, "val_avg_loss_min": 1.312038, "val_avg_loss_max": 3.319673, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 3.319673, "val_avg_loss_cos1": 0.928329, "val_avg_loss_entropy": 1.021505, "val_accuracy_std": 0.21288, "val_accuracy_bottom_decile": 0.017102, "val_accuracy_top_decile": 0.538069, "val_accuracy_min": 0.017102, "val_accuracy_max": 0.538069, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.538069, "val_accuracy_cos1": 0.800202, "val_accuracy_entropy": 0.736103}}
+
+2025-05-31 15:08:06,723 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '365.53K', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:08:06,723 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '72.72K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:08:06,734 (server:344) INFO: Server: Starting evaluation at the end of round 5.
+2025-05-31 15:08:06,738 (server:350) INFO: ----------- Starting a new training round (Round #6) -------------
+2025-05-31 15:08:06,747 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:08:06,752 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:06,752 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:12,600 (client:554) INFO: {'Role': 'Client #1', 'Round': 5, 'Results_raw': {'val_loss': 13273.703125, 'val_total': 6550, 'val_avg_loss': 2.02652, 'val_accuracy': 0.174656}}
+2025-05-31 15:08:12,606 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:08:12,611 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:12,611 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:15,029 (client:554) INFO: {'Role': 'Client #2', 'Round': 5, 'Results_raw': {'val_loss': 1644.34375, 'val_total': 2154, 'val_avg_loss': 0.763391, 'val_accuracy': 0.455432}}
+2025-05-31 15:08:15,035 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:08:15,040 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:15,040 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:16,832 (client:554) INFO: {'Role': 'Client #3', 'Round': 5, 'Results_raw': {'val_loss': 733.521484, 'val_total': 1111, 'val_avg_loss': 0.660235, 'val_accuracy': 0.979298}}
+2025-05-31 15:08:19,979 (client:357) INFO: {'Role': 'Client #3', 'Round': 6, 'Results_raw': {'train_loss': 1165.25, 'train_total': 1280, 'train_avg_loss': 0.910352, 'train_accuracy': 0.535937}}
+2025-05-31 15:08:23,119 (client:357) INFO: {'Role': 'Client #1', 'Round': 6, 'Results_raw': {'train_loss': 1390.375, 'train_total': 1280, 'train_avg_loss': 1.08623, 'train_accuracy': 0.497656}}
+2025-05-31 15:08:26,247 (client:357) INFO: {'Role': 'Client #2', 'Round': 6, 'Results_raw': {'train_loss': 1148.375, 'train_total': 1280, 'train_avg_loss': 0.897168, 'train_accuracy': 0.439063}}
+2025-05-31 15:08:26,248 (server:616) INFO: {'Role': 'Server #', 'Round': 5, 'Results_weighted_avg': {'val_loss': 9302.04934, 'val_total': 3271.666667, 'val_avg_loss': 1.594658, 'val_accuracy': 0.327356}, 'Results_avg': {'val_loss': 5217.189453, 'val_total': 3271.666667, 'val_avg_loss': 1.150049, 'val_accuracy': 0.536462}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 5708.937946, 'val_loss_bottom_decile': 733.521484, 'val_loss_top_decile': 13273.703125, 'val_loss_min': 733.521484, 'val_loss_max': 13273.703125, 'val_loss_bottom10%': nan, 'val_loss_top10%': 13273.703125, 'val_loss_cos1': 0.674599, 'val_loss_entropy': 0.519905, 'val_avg_loss_std': 0.621188, 'val_avg_loss_bottom_decile': 0.660235, 'val_avg_loss_top_decile': 2.02652, 'val_avg_loss_min': 0.660235, 'val_avg_loss_max': 2.02652, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 2.02652, 'val_avg_loss_cos1': 0.879854, 'val_avg_loss_entropy': 0.962728, 'val_accuracy_std': 0.333453, 'val_accuracy_bottom_decile': 0.174656, 'val_accuracy_top_decile': 0.979298, 'val_accuracy_min': 0.174656, 'val_accuracy_max': 0.979298, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.979298, 'val_accuracy_cos1': 0.849302, 'val_accuracy_entropy': 0.900519}}
+2025-05-31 15:08:26,251 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 5, "Results_weighted_avg": {"val_loss": 9302.04934, "val_total": 3271.666667, "val_avg_loss": 1.594658, "val_accuracy": 0.327356}, "Results_avg": {"val_loss": 5217.189453, "val_total": 3271.666667, "val_avg_loss": 1.150049, "val_accuracy": 0.536462}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 5708.937946, "val_loss_bottom_decile": 733.521484, "val_loss_top_decile": 13273.703125, "val_loss_min": 733.521484, "val_loss_max": 13273.703125, "val_loss_bottom10%": null, "val_loss_top10%": 13273.703125, "val_loss_cos1": 0.674599, "val_loss_entropy": 0.519905, "val_avg_loss_std": 0.621188, "val_avg_loss_bottom_decile": 0.660235, "val_avg_loss_top_decile": 2.02652, "val_avg_loss_min": 0.660235, "val_avg_loss_max": 2.02652, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 2.02652, "val_avg_loss_cos1": 0.879854, "val_avg_loss_entropy": 0.962728, "val_accuracy_std": 0.333453, "val_accuracy_bottom_decile": 0.174656, "val_accuracy_top_decile": 0.979298, "val_accuracy_min": 0.174656, "val_accuracy_max": 0.979298, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.979298, "val_accuracy_cos1": 0.849302, "val_accuracy_entropy": 0.900519}}
+
+2025-05-31 15:08:26,255 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '433.11K', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:08:26,255 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '84.0K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:08:26,266 (server:344) INFO: Server: Starting evaluation at the end of round 6.
+2025-05-31 15:08:26,270 (server:350) INFO: ----------- Starting a new training round (Round #7) -------------
+2025-05-31 15:08:26,279 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:08:26,283 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:26,284 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:35,721 (client:554) INFO: {'Role': 'Client #1', 'Round': 6, 'Results_raw': {'val_loss': 11604.365234, 'val_total': 6550, 'val_avg_loss': 1.771659, 'val_accuracy': 0.174656}}
+2025-05-31 15:08:35,727 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:08:35,732 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:35,732 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:38,144 (client:554) INFO: {'Role': 'Client #2', 'Round': 6, 'Results_raw': {'val_loss': 1685.459961, 'val_total': 2154, 'val_avg_loss': 0.782479, 'val_accuracy': 0.455432}}
+2025-05-31 15:08:38,150 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:08:38,155 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:38,155 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:39,729 (client:554) INFO: {'Role': 'Client #3', 'Round': 6, 'Results_raw': {'val_loss': 807.01123, 'val_total': 1111, 'val_avg_loss': 0.726383, 'val_accuracy': 0.979298}}
+2025-05-31 15:08:42,862 (client:357) INFO: {'Role': 'Client #3', 'Round': 7, 'Results_raw': {'train_loss': 1124.4375, 'train_total': 1280, 'train_avg_loss': 0.878467, 'train_accuracy': 0.5}}
+2025-05-31 15:08:45,994 (client:357) INFO: {'Role': 'Client #1', 'Round': 7, 'Results_raw': {'train_loss': 1379.9375, 'train_total': 1280, 'train_avg_loss': 1.078076, 'train_accuracy': 0.476562}}
+2025-05-31 15:08:49,128 (client:357) INFO: {'Role': 'Client #2', 'Round': 7, 'Results_raw': {'train_loss': 1088.8125, 'train_total': 1280, 'train_avg_loss': 0.850635, 'train_accuracy': 0.514062}}
+2025-05-31 15:08:49,129 (server:616) INFO: {'Role': 'Server #', 'Round': 6, 'Results_weighted_avg': {'val_loss': 8205.365514, 'val_total': 3271.666667, 'val_avg_loss': 1.436254, 'val_accuracy': 0.327356}, 'Results_avg': {'val_loss': 4698.945475, 'val_total': 3271.666667, 'val_avg_loss': 1.093507, 'val_accuracy': 0.536462}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 4896.021145, 'val_loss_bottom_decile': 807.01123, 'val_loss_top_decile': 11604.365234, 'val_loss_min': 807.01123, 'val_loss_max': 11604.365234, 'val_loss_bottom10%': nan, 'val_loss_top10%': 11604.365234, 'val_loss_cos1': 0.692437, 'val_loss_entropy': 0.577858, 'val_avg_loss_std': 0.480072, 'val_avg_loss_bottom_decile': 0.726383, 'val_avg_loss_top_decile': 1.771659, 'val_avg_loss_min': 0.726383, 'val_avg_loss_max': 1.771659, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 1.771659, 'val_avg_loss_cos1': 0.915645, 'val_avg_loss_entropy': 1.008427, 'val_accuracy_std': 0.333453, 'val_accuracy_bottom_decile': 0.174656, 'val_accuracy_top_decile': 0.979298, 'val_accuracy_min': 0.174656, 'val_accuracy_max': 0.979298, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.979298, 'val_accuracy_cos1': 0.849302, 'val_accuracy_entropy': 0.900519}}
+2025-05-31 15:08:49,129 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 6, "Results_weighted_avg": {"val_loss": 8205.365514, "val_total": 3271.666667, "val_avg_loss": 1.436254, "val_accuracy": 0.327356}, "Results_avg": {"val_loss": 4698.945475, "val_total": 3271.666667, "val_avg_loss": 1.093507, "val_accuracy": 0.536462}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 4896.021145, "val_loss_bottom_decile": 807.01123, "val_loss_top_decile": 11604.365234, "val_loss_min": 807.01123, "val_loss_max": 11604.365234, "val_loss_bottom10%": null, "val_loss_top10%": 11604.365234, "val_loss_cos1": 0.692437, "val_loss_entropy": 0.577858, "val_avg_loss_std": 0.480072, "val_avg_loss_bottom_decile": 0.726383, "val_avg_loss_top_decile": 1.771659, "val_avg_loss_min": 0.726383, "val_avg_loss_max": 1.771659, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 1.771659, "val_avg_loss_cos1": 0.915645, "val_avg_loss_entropy": 1.008427, "val_accuracy_std": 0.333453, "val_accuracy_bottom_decile": 0.174656, "val_accuracy_top_decile": 0.979298, "val_accuracy_min": 0.174656, "val_accuracy_max": 0.979298, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.979298, "val_accuracy_cos1": 0.849302, "val_accuracy_entropy": 0.900519}}
+
+2025-05-31 15:08:49,130 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '500.69K', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:08:49,130 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '95.29K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:08:49,141 (server:344) INFO: Server: Starting evaluation at the end of round 7.
+2025-05-31 15:08:49,145 (server:350) INFO: ----------- Starting a new training round (Round #8) -------------
+2025-05-31 15:08:49,154 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:08:49,159 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:49,159 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:55,003 (client:554) INFO: {'Role': 'Client #1', 'Round': 7, 'Results_raw': {'val_loss': 10636.208984, 'val_total': 6550, 'val_avg_loss': 1.623849, 'val_accuracy': 0.174656}}
+2025-05-31 15:08:55,009 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:08:55,013 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:55,014 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:57,377 (client:554) INFO: {'Role': 'Client #2', 'Round': 7, 'Results_raw': {'val_loss': 1754.035156, 'val_total': 2154, 'val_avg_loss': 0.814315, 'val_accuracy': 0.455432}}
+2025-05-31 15:08:57,383 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:08:57,388 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:57,388 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:08:58,949 (client:554) INFO: {'Role': 'Client #3', 'Round': 7, 'Results_raw': {'val_loss': 800.523926, 'val_total': 1111, 'val_avg_loss': 0.720544, 'val_accuracy': 0.979298}}
+2025-05-31 15:09:02,087 (client:357) INFO: {'Role': 'Client #3', 'Round': 8, 'Results_raw': {'train_loss': 1110.0, 'train_total': 1280, 'train_avg_loss': 0.867188, 'train_accuracy': 0.517188}}
+2025-05-31 15:09:05,240 (client:357) INFO: {'Role': 'Client #1', 'Round': 8, 'Results_raw': {'train_loss': 1416.125, 'train_total': 1280, 'train_avg_loss': 1.106348, 'train_accuracy': 0.485156}}
+2025-05-31 15:09:11,977 (client:357) INFO: {'Role': 'Client #2', 'Round': 8, 'Results_raw': {'train_loss': 1097.9375, 'train_total': 1280, 'train_avg_loss': 0.857764, 'train_accuracy': 0.460938}}
+2025-05-31 15:09:11,978 (server:616) INFO: {'Role': 'Server #', 'Round': 7, 'Results_weighted_avg': {'val_loss': 7573.585599, 'val_total': 3271.666667, 'val_avg_loss': 1.34394, 'val_accuracy': 0.327356}, 'Results_avg': {'val_loss': 4396.922689, 'val_total': 3271.666667, 'val_avg_loss': 1.052903, 'val_accuracy': 0.536462}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 4428.981525, 'val_loss_bottom_decile': 800.523926, 'val_loss_top_decile': 10636.208984, 'val_loss_min': 800.523926, 'val_loss_max': 10636.208984, 'val_loss_bottom10%': nan, 'val_loss_top10%': 10636.208984, 'val_loss_cos1': 0.704534, 'val_loss_entropy': 0.611904, 'val_avg_loss_std': 0.405531, 'val_avg_loss_bottom_decile': 0.720544, 'val_avg_loss_top_decile': 1.623849, 'val_avg_loss_min': 0.720544, 'val_avg_loss_max': 1.623849, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 1.623849, 'val_avg_loss_cos1': 0.933177, 'val_avg_loss_entropy': 1.028652, 'val_accuracy_std': 0.333453, 'val_accuracy_bottom_decile': 0.174656, 'val_accuracy_top_decile': 0.979298, 'val_accuracy_min': 0.174656, 'val_accuracy_max': 0.979298, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.979298, 'val_accuracy_cos1': 0.849302, 'val_accuracy_entropy': 0.900519}}
+2025-05-31 15:09:11,978 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 7, "Results_weighted_avg": {"val_loss": 7573.585599, "val_total": 3271.666667, "val_avg_loss": 1.34394, "val_accuracy": 0.327356}, "Results_avg": {"val_loss": 4396.922689, "val_total": 3271.666667, "val_avg_loss": 1.052903, "val_accuracy": 0.536462}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 4428.981525, "val_loss_bottom_decile": 800.523926, "val_loss_top_decile": 10636.208984, "val_loss_min": 800.523926, "val_loss_max": 10636.208984, "val_loss_bottom10%": null, "val_loss_top10%": 10636.208984, "val_loss_cos1": 0.704534, "val_loss_entropy": 0.611904, "val_avg_loss_std": 0.405531, "val_avg_loss_bottom_decile": 0.720544, "val_avg_loss_top_decile": 1.623849, "val_avg_loss_min": 0.720544, "val_avg_loss_max": 1.623849, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 1.623849, "val_avg_loss_cos1": 0.933177, "val_avg_loss_entropy": 1.028652, "val_accuracy_std": 0.333453, "val_accuracy_bottom_decile": 0.174656, "val_accuracy_top_decile": 0.979298, "val_accuracy_min": 0.174656, "val_accuracy_max": 0.979298, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.979298, "val_accuracy_cos1": 0.849302, "val_accuracy_entropy": 0.900519}}
+
+2025-05-31 15:09:11,979 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '568.26K', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:09:11,979 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '106.58K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:09:11,989 (server:344) INFO: Server: Starting evaluation at the end of round 8.
+2025-05-31 15:09:11,993 (server:350) INFO: ----------- Starting a new training round (Round #9) -------------
+2025-05-31 15:09:12,002 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:09:12,006 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:12,007 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:17,871 (client:554) INFO: {'Role': 'Client #1', 'Round': 8, 'Results_raw': {'val_loss': 10867.943359, 'val_total': 6550, 'val_avg_loss': 1.659228, 'val_accuracy': 0.174656}}
+2025-05-31 15:09:17,877 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:09:17,882 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:17,882 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:20,297 (client:554) INFO: {'Role': 'Client #2', 'Round': 8, 'Results_raw': {'val_loss': 1767.069336, 'val_total': 2154, 'val_avg_loss': 0.820366, 'val_accuracy': 0.455432}}
+2025-05-31 15:09:20,303 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:09:20,308 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:20,308 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:21,894 (client:554) INFO: {'Role': 'Client #3', 'Round': 8, 'Results_raw': {'val_loss': 738.826172, 'val_total': 1111, 'val_avg_loss': 0.66501, 'val_accuracy': 0.979298}}
+2025-05-31 15:09:25,019 (client:357) INFO: {'Role': 'Client #2', 'Round': 9, 'Results_raw': {'train_loss': 1001.5625, 'train_total': 1280, 'train_avg_loss': 0.782471, 'train_accuracy': 0.508594}}
+2025-05-31 15:09:28,146 (client:357) INFO: {'Role': 'Client #1', 'Round': 9, 'Results_raw': {'train_loss': 1338.3125, 'train_total': 1280, 'train_avg_loss': 1.045557, 'train_accuracy': 0.529687}}
+2025-05-31 15:09:31,247 (client:357) INFO: {'Role': 'Client #3', 'Round': 9, 'Results_raw': {'train_loss': 1138.9375, 'train_total': 1280, 'train_avg_loss': 0.889795, 'train_accuracy': 0.546875}}
+2025-05-31 15:09:31,248 (server:616) INFO: {'Role': 'Server #', 'Round': 8, 'Results_weighted_avg': {'val_loss': 7724.109244, 'val_total': 3271.666667, 'val_avg_loss': 1.362592, 'val_accuracy': 0.327356}, 'Results_avg': {'val_loss': 4457.946289, 'val_total': 3271.666667, 'val_avg_loss': 1.048202, 'val_accuracy': 0.536462}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 4551.949607, 'val_loss_bottom_decile': 738.826172, 'val_loss_top_decile': 10867.943359, 'val_loss_min': 738.826172, 'val_loss_max': 10867.943359, 'val_loss_bottom10%': nan, 'val_loss_top10%': 10867.943359, 'val_loss_cos1': 0.699691, 'val_loss_entropy': 0.596019, 'val_avg_loss_std': 0.436691, 'val_avg_loss_bottom_decile': 0.66501, 'val_avg_loss_top_decile': 1.659228, 'val_avg_loss_min': 0.66501, 'val_avg_loss_max': 1.659228, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 1.659228, 'val_avg_loss_cos1': 0.923095, 'val_avg_loss_entropy': 1.016443, 'val_accuracy_std': 0.333453, 'val_accuracy_bottom_decile': 0.174656, 'val_accuracy_top_decile': 0.979298, 'val_accuracy_min': 0.174656, 'val_accuracy_max': 0.979298, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.979298, 'val_accuracy_cos1': 0.849302, 'val_accuracy_entropy': 0.900519}}
+2025-05-31 15:09:31,248 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 8, "Results_weighted_avg": {"val_loss": 7724.109244, "val_total": 3271.666667, "val_avg_loss": 1.362592, "val_accuracy": 0.327356}, "Results_avg": {"val_loss": 4457.946289, "val_total": 3271.666667, "val_avg_loss": 1.048202, "val_accuracy": 0.536462}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 4551.949607, "val_loss_bottom_decile": 738.826172, "val_loss_top_decile": 10867.943359, "val_loss_min": 738.826172, "val_loss_max": 10867.943359, "val_loss_bottom10%": null, "val_loss_top10%": 10867.943359, "val_loss_cos1": 0.699691, "val_loss_entropy": 0.596019, "val_avg_loss_std": 0.436691, "val_avg_loss_bottom_decile": 0.66501, "val_avg_loss_top_decile": 1.659228, "val_avg_loss_min": 0.66501, "val_avg_loss_max": 1.659228, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 1.659228, "val_avg_loss_cos1": 0.923095, "val_avg_loss_entropy": 1.016443, "val_accuracy_std": 0.333453, "val_accuracy_bottom_decile": 0.174656, "val_accuracy_top_decile": 0.979298, "val_accuracy_min": 0.174656, "val_accuracy_max": 0.979298, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.979298, "val_accuracy_cos1": 0.849302, "val_accuracy_entropy": 0.900519}}
+
+2025-05-31 15:09:31,249 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '635.84K', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:09:31,249 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '117.87K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:09:31,259 (server:344) INFO: Server: Starting evaluation at the end of round 9.
+2025-05-31 15:09:31,263 (server:350) INFO: ----------- Starting a new training round (Round #10) -------------
+2025-05-31 15:09:31,272 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:09:31,277 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:31,277 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:37,124 (client:554) INFO: {'Role': 'Client #1', 'Round': 9, 'Results_raw': {'val_loss': 8514.638672, 'val_total': 6550, 'val_avg_loss': 1.299945, 'val_accuracy': 0.296947}}
+2025-05-31 15:09:37,132 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:09:37,137 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:37,137 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:39,538 (client:554) INFO: {'Role': 'Client #2', 'Round': 9, 'Results_raw': {'val_loss': 3671.464844, 'val_total': 2154, 'val_avg_loss': 1.704487, 'val_accuracy': 0.538069}}
+2025-05-31 15:09:39,544 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:09:39,549 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:39,549 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:41,094 (client:554) INFO: {'Role': 'Client #3', 'Round': 9, 'Results_raw': {'val_loss': 3503.292969, 'val_total': 1111, 'val_avg_loss': 3.153279, 'val_accuracy': 0.017102}}
+2025-05-31 15:09:47,843 (client:357) INFO: {'Role': 'Client #1', 'Round': 10, 'Results_raw': {'train_loss': 1365.125, 'train_total': 1280, 'train_avg_loss': 1.066504, 'train_accuracy': 0.505469}}
+2025-05-31 15:09:50,960 (client:357) INFO: {'Role': 'Client #3', 'Round': 10, 'Results_raw': {'train_loss': 1171.25, 'train_total': 1280, 'train_avg_loss': 0.915039, 'train_accuracy': 0.551562}}
+2025-05-31 15:09:54,094 (client:357) INFO: {'Role': 'Client #2', 'Round': 10, 'Results_raw': {'train_loss': 1243.0625, 'train_total': 1280, 'train_avg_loss': 0.971143, 'train_accuracy': 0.483594}}
+2025-05-31 15:09:54,095 (server:616) INFO: {'Role': 'Server #', 'Round': 9, 'Results_weighted_avg': {'val_loss': 6884.500974, 'val_total': 3271.666667, 'val_avg_loss': 1.598512, 'val_accuracy': 0.318186}, 'Results_avg': {'val_loss': 5229.798828, 'val_total': 3271.666667, 'val_avg_loss': 2.05257, 'val_accuracy': 0.284039}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 2323.746981, 'val_loss_bottom_decile': 3503.292969, 'val_loss_top_decile': 8514.638672, 'val_loss_min': 3503.292969, 'val_loss_max': 8514.638672, 'val_loss_bottom10%': nan, 'val_loss_top10%': 8514.638672, 'val_loss_cos1': 0.913851, 'val_loss_entropy': 1.006347, 'val_avg_loss_std': 0.795648, 'val_avg_loss_bottom_decile': 1.299945, 'val_avg_loss_top_decile': 3.153279, 'val_avg_loss_min': 1.299945, 'val_avg_loss_max': 3.153279, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 3.153279, 'val_avg_loss_cos1': 0.932399, 'val_avg_loss_entropy': 1.026615, 'val_accuracy_std': 0.21288, 'val_accuracy_bottom_decile': 0.017102, 'val_accuracy_top_decile': 0.538069, 'val_accuracy_min': 0.017102, 'val_accuracy_max': 0.538069, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.538069, 'val_accuracy_cos1': 0.800202, 'val_accuracy_entropy': 0.736103}}
+2025-05-31 15:09:54,095 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 9, "Results_weighted_avg": {"val_loss": 6884.500974, "val_total": 3271.666667, "val_avg_loss": 1.598512, "val_accuracy": 0.318186}, "Results_avg": {"val_loss": 5229.798828, "val_total": 3271.666667, "val_avg_loss": 2.05257, "val_accuracy": 0.284039}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 2323.746981, "val_loss_bottom_decile": 3503.292969, "val_loss_top_decile": 8514.638672, "val_loss_min": 3503.292969, "val_loss_max": 8514.638672, "val_loss_bottom10%": null, "val_loss_top10%": 8514.638672, "val_loss_cos1": 0.913851, "val_loss_entropy": 1.006347, "val_avg_loss_std": 0.795648, "val_avg_loss_bottom_decile": 1.299945, "val_avg_loss_top_decile": 3.153279, "val_avg_loss_min": 1.299945, "val_avg_loss_max": 3.153279, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 3.153279, "val_avg_loss_cos1": 0.932399, "val_avg_loss_entropy": 1.026615, "val_accuracy_std": 0.21288, "val_accuracy_bottom_decile": 0.017102, "val_accuracy_top_decile": 0.538069, "val_accuracy_min": 0.017102, "val_accuracy_max": 0.538069, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.538069, "val_accuracy_cos1": 0.800202, "val_accuracy_entropy": 0.736103}}
+
+2025-05-31 15:09:54,096 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '703.41K', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:09:54,096 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '129.16K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:09:54,107 (server:344) INFO: Server: Starting evaluation at the end of round 10.
+2025-05-31 15:09:54,111 (server:350) INFO: ----------- Starting a new training round (Round #11) -------------
+2025-05-31 15:09:54,120 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:09:54,125 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:54,125 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:59,980 (client:554) INFO: {'Role': 'Client #1', 'Round': 10, 'Results_raw': {'val_loss': 11907.021484, 'val_total': 6550, 'val_avg_loss': 1.817866, 'val_accuracy': 0.29145}}
+2025-05-31 15:09:59,986 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:09:59,991 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:09:59,991 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:02,397 (client:554) INFO: {'Role': 'Client #2', 'Round': 10, 'Results_raw': {'val_loss': 1654.660156, 'val_total': 2154, 'val_avg_loss': 0.76818, 'val_accuracy': 0.534355}}
+2025-05-31 15:10:02,403 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:10:02,408 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:02,408 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:03,957 (client:554) INFO: {'Role': 'Client #3', 'Round': 10, 'Results_raw': {'val_loss': 871.463867, 'val_total': 1111, 'val_avg_loss': 0.784396, 'val_accuracy': 0.09631}}
+2025-05-31 15:10:07,109 (client:357) INFO: {'Role': 'Client #1', 'Round': 11, 'Results_raw': {'train_loss': 1327.9375, 'train_total': 1280, 'train_avg_loss': 1.037451, 'train_accuracy': 0.521094}}
+2025-05-31 15:10:10,220 (client:357) INFO: {'Role': 'Client #2', 'Round': 11, 'Results_raw': {'train_loss': 1092.25, 'train_total': 1280, 'train_avg_loss': 0.85332, 'train_accuracy': 0.457031}}
+2025-05-31 15:10:13,351 (client:357) INFO: {'Role': 'Client #3', 'Round': 11, 'Results_raw': {'train_loss': 1121.1875, 'train_total': 1280, 'train_avg_loss': 0.875928, 'train_accuracy': 0.546094}}
+2025-05-31 15:10:13,352 (server:616) INFO: {'Role': 'Server #', 'Round': 10, 'Results_weighted_avg': {'val_loss': 8407.878253, 'val_total': 3271.666667, 'val_avg_loss': 1.470519, 'val_accuracy': 0.322669}, 'Results_avg': {'val_loss': 4811.048503, 'val_total': 3271.666667, 'val_avg_loss': 1.123481, 'val_accuracy': 0.307372}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 5027.787686, 'val_loss_bottom_decile': 871.463867, 'val_loss_top_decile': 11907.021484, 'val_loss_min': 871.463867, 'val_loss_max': 11907.021484, 'val_loss_bottom10%': nan, 'val_loss_top10%': 11907.021484, 'val_loss_cos1': 0.691362, 'val_loss_entropy': 0.576525, 'val_avg_loss_std': 0.491049, 'val_avg_loss_bottom_decile': 0.76818, 'val_avg_loss_top_decile': 1.817866, 'val_avg_loss_min': 0.76818, 'val_avg_loss_max': 1.817866, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 1.817866, 'val_avg_loss_cos1': 0.916299, 'val_avg_loss_entropy': 1.009316, 'val_accuracy_std': 0.179185, 'val_accuracy_bottom_decile': 0.09631, 'val_accuracy_top_decile': 0.534355, 'val_accuracy_min': 0.09631, 'val_accuracy_max': 0.534355, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.534355, 'val_accuracy_cos1': 0.863919, 'val_accuracy_entropy': 0.916171}}
+2025-05-31 15:10:13,352 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 10, "Results_weighted_avg": {"val_loss": 8407.878253, "val_total": 3271.666667, "val_avg_loss": 1.470519, "val_accuracy": 0.322669}, "Results_avg": {"val_loss": 4811.048503, "val_total": 3271.666667, "val_avg_loss": 1.123481, "val_accuracy": 0.307372}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 5027.787686, "val_loss_bottom_decile": 871.463867, "val_loss_top_decile": 11907.021484, "val_loss_min": 871.463867, "val_loss_max": 11907.021484, "val_loss_bottom10%": null, "val_loss_top10%": 11907.021484, "val_loss_cos1": 0.691362, "val_loss_entropy": 0.576525, "val_avg_loss_std": 0.491049, "val_avg_loss_bottom_decile": 0.76818, "val_avg_loss_top_decile": 1.817866, "val_avg_loss_min": 0.76818, "val_avg_loss_max": 1.817866, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 1.817866, "val_avg_loss_cos1": 0.916299, "val_avg_loss_entropy": 1.009316, "val_accuracy_std": 0.179185, "val_accuracy_bottom_decile": 0.09631, "val_accuracy_top_decile": 0.534355, "val_accuracy_min": 0.09631, "val_accuracy_max": 0.534355, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.534355, "val_accuracy_cos1": 0.863919, "val_accuracy_entropy": 0.916171}}
+
+2025-05-31 15:10:13,355 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '770.99K', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:10:13,355 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '140.45K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:10:13,367 (server:344) INFO: Server: Starting evaluation at the end of round 11.
+2025-05-31 15:10:13,371 (server:350) INFO: ----------- Starting a new training round (Round #12) -------------
+2025-05-31 15:10:13,380 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:10:13,385 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:13,385 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:22,865 (client:554) INFO: {'Role': 'Client #1', 'Round': 11, 'Results_raw': {'val_loss': 8127.931641, 'val_total': 6550, 'val_avg_loss': 1.240906, 'val_accuracy': 0.296947}}
+2025-05-31 15:10:22,871 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:10:22,876 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:22,876 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:25,300 (client:554) INFO: {'Role': 'Client #2', 'Round': 11, 'Results_raw': {'val_loss': 3542.330078, 'val_total': 2154, 'val_avg_loss': 1.644536, 'val_accuracy': 0.538069}}
+2025-05-31 15:10:25,306 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:10:25,311 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:25,311 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:26,865 (client:554) INFO: {'Role': 'Client #3', 'Round': 11, 'Results_raw': {'val_loss': 3294.640625, 'val_total': 1111, 'val_avg_loss': 2.965473, 'val_accuracy': 0.017102}}
+2025-05-31 15:10:29,982 (client:357) INFO: {'Role': 'Client #2', 'Round': 12, 'Results_raw': {'train_loss': 1203.625, 'train_total': 1280, 'train_avg_loss': 0.940332, 'train_accuracy': 0.466406}}
+2025-05-31 15:10:33,109 (client:357) INFO: {'Role': 'Client #3', 'Round': 12, 'Results_raw': {'train_loss': 1068.3125, 'train_total': 1280, 'train_avg_loss': 0.834619, 'train_accuracy': 0.570312}}
+2025-05-31 15:10:36,209 (client:357) INFO: {'Role': 'Client #1', 'Round': 12, 'Results_raw': {'train_loss': 1387.75, 'train_total': 1280, 'train_avg_loss': 1.08418, 'train_accuracy': 0.484375}}
+2025-05-31 15:10:36,210 (server:616) INFO: {'Role': 'Server #', 'Round': 11, 'Results_weighted_avg': {'val_loss': 6574.475494, 'val_total': 3271.666667, 'val_avg_loss': 1.524697, 'val_accuracy': 0.318186}, 'Results_avg': {'val_loss': 4988.300781, 'val_total': 3271.666667, 'val_avg_loss': 1.950305, 'val_accuracy': 0.284039}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 2222.355952, 'val_loss_bottom_decile': 3294.640625, 'val_loss_top_decile': 8127.931641, 'val_loss_min': 3294.640625, 'val_loss_max': 8127.931641, 'val_loss_bottom10%': nan, 'val_loss_top10%': 8127.931641, 'val_loss_cos1': 0.913449, 'val_loss_entropy': 1.005798, 'val_avg_loss_std': 0.736503, 'val_avg_loss_bottom_decile': 1.240906, 'val_avg_loss_top_decile': 2.965473, 'val_avg_loss_min': 1.240906, 'val_avg_loss_max': 2.965473, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 2.965473, 'val_avg_loss_cos1': 0.935516, 'val_avg_loss_entropy': 1.030046, 'val_accuracy_std': 0.21288, 'val_accuracy_bottom_decile': 0.017102, 'val_accuracy_top_decile': 0.538069, 'val_accuracy_min': 0.017102, 'val_accuracy_max': 0.538069, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.538069, 'val_accuracy_cos1': 0.800202, 'val_accuracy_entropy': 0.736103}}
+2025-05-31 15:10:36,210 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 11, "Results_weighted_avg": {"val_loss": 6574.475494, "val_total": 3271.666667, "val_avg_loss": 1.524697, "val_accuracy": 0.318186}, "Results_avg": {"val_loss": 4988.300781, "val_total": 3271.666667, "val_avg_loss": 1.950305, "val_accuracy": 0.284039}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 2222.355952, "val_loss_bottom_decile": 3294.640625, "val_loss_top_decile": 8127.931641, "val_loss_min": 3294.640625, "val_loss_max": 8127.931641, "val_loss_bottom10%": null, "val_loss_top10%": 8127.931641, "val_loss_cos1": 0.913449, "val_loss_entropy": 1.005798, "val_avg_loss_std": 0.736503, "val_avg_loss_bottom_decile": 1.240906, "val_avg_loss_top_decile": 2.965473, "val_avg_loss_min": 1.240906, "val_avg_loss_max": 2.965473, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 2.965473, "val_avg_loss_cos1": 0.935516, "val_avg_loss_entropy": 1.030046, "val_accuracy_std": 0.21288, "val_accuracy_bottom_decile": 0.017102, "val_accuracy_top_decile": 0.538069, "val_accuracy_min": 0.017102, "val_accuracy_max": 0.538069, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.538069, "val_accuracy_cos1": 0.800202, "val_accuracy_entropy": 0.736103}}
+
+2025-05-31 15:10:36,211 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '838.57K', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:10:36,211 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '151.74K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:10:36,221 (server:344) INFO: Server: Starting evaluation at the end of round 12.
+2025-05-31 15:10:36,225 (server:350) INFO: ----------- Starting a new training round (Round #13) -------------
+2025-05-31 15:10:36,234 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:10:36,238 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:36,238 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:42,094 (client:554) INFO: {'Role': 'Client #1', 'Round': 12, 'Results_raw': {'val_loss': 7183.236328, 'val_total': 6550, 'val_avg_loss': 1.096677, 'val_accuracy': 0.527481}}
+2025-05-31 15:10:42,100 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:10:42,105 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:42,105 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:44,482 (client:554) INFO: {'Role': 'Client #2', 'Round': 12, 'Results_raw': {'val_loss': 2756.111328, 'val_total': 2154, 'val_avg_loss': 1.279532, 'val_accuracy': 0.0065}}
+2025-05-31 15:10:44,488 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:10:44,493 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:44,493 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:46,034 (client:554) INFO: {'Role': 'Client #3', 'Round': 12, 'Results_raw': {'val_loss': 1101.835449, 'val_total': 1111, 'val_avg_loss': 0.991751, 'val_accuracy': 0.0036}}
+2025-05-31 15:10:49,172 (client:357) INFO: {'Role': 'Client #2', 'Round': 13, 'Results_raw': {'train_loss': 1064.8125, 'train_total': 1280, 'train_avg_loss': 0.831885, 'train_accuracy': 0.476562}}
+2025-05-31 15:10:52,268 (client:357) INFO: {'Role': 'Client #3', 'Round': 13, 'Results_raw': {'train_loss': 1090.0625, 'train_total': 1280, 'train_avg_loss': 0.851611, 'train_accuracy': 0.532813}}
+2025-05-31 15:10:58,969 (client:357) INFO: {'Role': 'Client #1', 'Round': 13, 'Results_raw': {'train_loss': 1343.875, 'train_total': 1280, 'train_avg_loss': 1.049902, 'train_accuracy': 0.50625}}
+2025-05-31 15:10:58,970 (server:616) INFO: {'Role': 'Server #', 'Round': 12, 'Results_weighted_avg': {'val_loss': 5523.280788, 'val_total': 3271.666667, 'val_avg_loss': 1.12493, 'val_accuracy': 0.353846}, 'Results_avg': {'val_loss': 3680.394368, 'val_total': 3271.666667, 'val_avg_loss': 1.122653, 'val_accuracy': 0.179194}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 2567.305139, 'val_loss_bottom_decile': 1101.835449, 'val_loss_top_decile': 7183.236328, 'val_loss_min': 1101.835449, 'val_loss_max': 7183.236328, 'val_loss_bottom10%': nan, 'val_loss_top10%': 7183.236328, 'val_loss_cos1': 0.82017, 'val_loss_entropy': 0.856091, 'val_avg_loss_std': 0.118913, 'val_avg_loss_bottom_decile': 0.991751, 'val_avg_loss_top_decile': 1.279532, 'val_avg_loss_min': 0.991751, 'val_avg_loss_max': 1.279532, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 1.279532, 'val_avg_loss_cos1': 0.994437, 'val_avg_loss_entropy': 1.09305, 'val_accuracy_std': 0.246279, 'val_accuracy_bottom_decile': 0.0036, 'val_accuracy_top_decile': 0.527481, 'val_accuracy_min': 0.0036, 'val_accuracy_max': 0.527481, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.527481, 'val_accuracy_cos1': 0.588347, 'val_accuracy_entropy': 0.10552}}
+2025-05-31 15:10:58,970 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 12, "Results_weighted_avg": {"val_loss": 5523.280788, "val_total": 3271.666667, "val_avg_loss": 1.12493, "val_accuracy": 0.353846}, "Results_avg": {"val_loss": 3680.394368, "val_total": 3271.666667, "val_avg_loss": 1.122653, "val_accuracy": 0.179194}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 2567.305139, "val_loss_bottom_decile": 1101.835449, "val_loss_top_decile": 7183.236328, "val_loss_min": 1101.835449, "val_loss_max": 7183.236328, "val_loss_bottom10%": null, "val_loss_top10%": 7183.236328, "val_loss_cos1": 0.82017, "val_loss_entropy": 0.856091, "val_avg_loss_std": 0.118913, "val_avg_loss_bottom_decile": 0.991751, "val_avg_loss_top_decile": 1.279532, "val_avg_loss_min": 0.991751, "val_avg_loss_max": 1.279532, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 1.279532, "val_avg_loss_cos1": 0.994437, "val_avg_loss_entropy": 1.09305, "val_accuracy_std": 0.246279, "val_accuracy_bottom_decile": 0.0036, "val_accuracy_top_decile": 0.527481, "val_accuracy_min": 0.0036, "val_accuracy_max": 0.527481, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.527481, "val_accuracy_cos1": 0.588347, "val_accuracy_entropy": 0.10552}}
+
+2025-05-31 15:10:58,971 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '906.14K', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:10:58,971 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '163.03K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:10:58,981 (server:344) INFO: Server: Starting evaluation at the end of round 13.
+2025-05-31 15:10:58,985 (server:350) INFO: ----------- Starting a new training round (Round #14) -------------
+2025-05-31 15:10:58,994 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:10:58,999 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:10:58,999 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:04,839 (client:554) INFO: {'Role': 'Client #1', 'Round': 13, 'Results_raw': {'val_loss': 7097.207031, 'val_total': 6550, 'val_avg_loss': 1.083543, 'val_accuracy': 0.528397}}
+2025-05-31 15:11:04,845 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:11:04,850 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:04,850 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:07,207 (client:554) INFO: {'Role': 'Client #2', 'Round': 13, 'Results_raw': {'val_loss': 3302.322266, 'val_total': 2154, 'val_avg_loss': 1.533112, 'val_accuracy': 0.0065}}
+2025-05-31 15:11:07,213 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:11:07,217 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:07,218 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:08,775 (client:554) INFO: {'Role': 'Client #3', 'Round': 13, 'Results_raw': {'val_loss': 1318.637695, 'val_total': 1111, 'val_avg_loss': 1.186893, 'val_accuracy': 0.0036}}
+2025-05-31 15:11:11,893 (client:357) INFO: {'Role': 'Client #1', 'Round': 14, 'Results_raw': {'train_loss': 1229.0, 'train_total': 1280, 'train_avg_loss': 0.960156, 'train_accuracy': 0.547656}}
+2025-05-31 15:11:15,002 (client:357) INFO: {'Role': 'Client #3', 'Round': 14, 'Results_raw': {'train_loss': 1038.1875, 'train_total': 1280, 'train_avg_loss': 0.811084, 'train_accuracy': 0.578125}}
+2025-05-31 15:11:18,140 (client:357) INFO: {'Role': 'Client #2', 'Round': 14, 'Results_raw': {'train_loss': 1120.875, 'train_total': 1280, 'train_avg_loss': 0.875684, 'train_accuracy': 0.503125}}
+2025-05-31 15:11:18,141 (server:616) INFO: {'Role': 'Server #', 'Round': 13, 'Results_weighted_avg': {'val_loss': 5610.281681, 'val_total': 3271.666667, 'val_avg_loss': 1.193904, 'val_accuracy': 0.354457}, 'Results_avg': {'val_loss': 3906.055664, 'val_total': 3271.666667, 'val_avg_loss': 1.267849, 'val_accuracy': 0.179499}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 2397.406433, 'val_loss_bottom_decile': 1318.637695, 'val_loss_top_decile': 7097.207031, 'val_loss_min': 1318.637695, 'val_loss_max': 7097.207031, 'val_loss_bottom10%': nan, 'val_loss_top10%': 7097.207031, 'val_loss_cos1': 0.852273, 'val_loss_entropy': 0.906445, 'val_avg_loss_std': 0.192256, 'val_avg_loss_bottom_decile': 1.083543, 'val_avg_loss_top_decile': 1.533112, 'val_avg_loss_min': 1.083543, 'val_avg_loss_max': 1.533112, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 1.533112, 'val_avg_loss_cos1': 0.988697, 'val_avg_loss_entropy': 1.087377, 'val_accuracy_std': 0.246711, 'val_accuracy_bottom_decile': 0.0036, 'val_accuracy_top_decile': 0.528397, 'val_accuracy_min': 0.0036, 'val_accuracy_max': 0.528397, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.528397, 'val_accuracy_cos1': 0.588328, 'val_accuracy_entropy': 0.105373}}
+2025-05-31 15:11:18,141 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 13, "Results_weighted_avg": {"val_loss": 5610.281681, "val_total": 3271.666667, "val_avg_loss": 1.193904, "val_accuracy": 0.354457}, "Results_avg": {"val_loss": 3906.055664, "val_total": 3271.666667, "val_avg_loss": 1.267849, "val_accuracy": 0.179499}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 2397.406433, "val_loss_bottom_decile": 1318.637695, "val_loss_top_decile": 7097.207031, "val_loss_min": 1318.637695, "val_loss_max": 7097.207031, "val_loss_bottom10%": null, "val_loss_top10%": 7097.207031, "val_loss_cos1": 0.852273, "val_loss_entropy": 0.906445, "val_avg_loss_std": 0.192256, "val_avg_loss_bottom_decile": 1.083543, "val_avg_loss_top_decile": 1.533112, "val_avg_loss_min": 1.083543, "val_avg_loss_max": 1.533112, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 1.533112, "val_avg_loss_cos1": 0.988697, "val_avg_loss_entropy": 1.087377, "val_accuracy_std": 0.246711, "val_accuracy_bottom_decile": 0.0036, "val_accuracy_top_decile": 0.528397, "val_accuracy_min": 0.0036, "val_accuracy_max": 0.528397, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.528397, "val_accuracy_cos1": 0.588328, "val_accuracy_entropy": 0.105373}}
+
+2025-05-31 15:11:18,142 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '973.72K', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:11:18,142 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '174.31K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:11:18,152 (server:344) INFO: Server: Starting evaluation at the end of round 14.
+2025-05-31 15:11:18,156 (server:350) INFO: ----------- Starting a new training round (Round #15) -------------
+2025-05-31 15:11:18,165 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:11:18,170 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:18,170 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:24,032 (client:554) INFO: {'Role': 'Client #1', 'Round': 14, 'Results_raw': {'val_loss': 10430.597656, 'val_total': 6550, 'val_avg_loss': 1.592458, 'val_accuracy': 0.296947}}
+2025-05-31 15:11:24,038 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:11:24,043 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:24,043 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:26,421 (client:554) INFO: {'Role': 'Client #2', 'Round': 14, 'Results_raw': {'val_loss': 1790.547852, 'val_total': 2154, 'val_avg_loss': 0.831266, 'val_accuracy': 0.538069}}
+2025-05-31 15:11:26,427 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:11:26,432 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:26,432 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:28,034 (client:554) INFO: {'Role': 'Client #3', 'Round': 14, 'Results_raw': {'val_loss': 1329.577148, 'val_total': 1111, 'val_avg_loss': 1.196739, 'val_accuracy': 0.017102}}
+2025-05-31 15:11:34,740 (client:357) INFO: {'Role': 'Client #2', 'Round': 15, 'Results_raw': {'train_loss': 1038.5, 'train_total': 1280, 'train_avg_loss': 0.811328, 'train_accuracy': 0.492188}}
+2025-05-31 15:11:37,862 (client:357) INFO: {'Role': 'Client #1', 'Round': 15, 'Results_raw': {'train_loss': 1338.5625, 'train_total': 1280, 'train_avg_loss': 1.045752, 'train_accuracy': 0.525}}
+2025-05-31 15:11:40,965 (client:357) INFO: {'Role': 'Client #3', 'Round': 15, 'Results_raw': {'train_loss': 1011.9375, 'train_total': 1280, 'train_avg_loss': 0.790576, 'train_accuracy': 0.528906}}
+2025-05-31 15:11:40,966 (server:616) INFO: {'Role': 'Server #', 'Round': 14, 'Results_weighted_avg': {'val_loss': 7504.270497, 'val_total': 3271.666667, 'val_avg_loss': 1.380614, 'val_accuracy': 0.318186}, 'Results_avg': {'val_loss': 4516.907552, 'val_total': 3271.666667, 'val_avg_loss': 1.206821, 'val_accuracy': 0.284039}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 4185.842925, 'val_loss_bottom_decile': 1329.577148, 'val_loss_top_decile': 10430.597656, 'val_loss_min': 1329.577148, 'val_loss_max': 10430.597656, 'val_loss_bottom10%': nan, 'val_loss_top10%': 10430.597656, 'val_loss_cos1': 0.733476, 'val_loss_entropy': 0.696663, 'val_avg_loss_std': 0.310837, 'val_avg_loss_bottom_decile': 0.831266, 'val_avg_loss_top_decile': 1.592458, 'val_avg_loss_min': 0.831266, 'val_avg_loss_max': 1.592458, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 1.592458, 'val_avg_loss_cos1': 0.968394, 'val_avg_loss_entropy': 1.065015, 'val_accuracy_std': 0.21288, 'val_accuracy_bottom_decile': 0.017102, 'val_accuracy_top_decile': 0.538069, 'val_accuracy_min': 0.017102, 'val_accuracy_max': 0.538069, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.538069, 'val_accuracy_cos1': 0.800202, 'val_accuracy_entropy': 0.736103}}
+2025-05-31 15:11:40,966 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 14, "Results_weighted_avg": {"val_loss": 7504.270497, "val_total": 3271.666667, "val_avg_loss": 1.380614, "val_accuracy": 0.318186}, "Results_avg": {"val_loss": 4516.907552, "val_total": 3271.666667, "val_avg_loss": 1.206821, "val_accuracy": 0.284039}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 4185.842925, "val_loss_bottom_decile": 1329.577148, "val_loss_top_decile": 10430.597656, "val_loss_min": 1329.577148, "val_loss_max": 10430.597656, "val_loss_bottom10%": null, "val_loss_top10%": 10430.597656, "val_loss_cos1": 0.733476, "val_loss_entropy": 0.696663, "val_avg_loss_std": 0.310837, "val_avg_loss_bottom_decile": 0.831266, "val_avg_loss_top_decile": 1.592458, "val_avg_loss_min": 0.831266, "val_avg_loss_max": 1.592458, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 1.592458, "val_avg_loss_cos1": 0.968394, "val_avg_loss_entropy": 1.065015, "val_accuracy_std": 0.21288, "val_accuracy_bottom_decile": 0.017102, "val_accuracy_top_decile": 0.538069, "val_accuracy_min": 0.017102, "val_accuracy_max": 0.538069, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.538069, "val_accuracy_cos1": 0.800202, "val_accuracy_entropy": 0.736103}}
+
+2025-05-31 15:11:40,967 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '1.02M', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:11:40,967 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '185.6K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:11:40,977 (server:344) INFO: Server: Starting evaluation at the end of round 15.
+2025-05-31 15:11:40,981 (server:350) INFO: ----------- Starting a new training round (Round #16) -------------
+2025-05-31 15:11:40,990 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:11:40,995 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:40,995 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:46,852 (client:554) INFO: {'Role': 'Client #1', 'Round': 15, 'Results_raw': {'val_loss': 6861.205078, 'val_total': 6550, 'val_avg_loss': 1.047512, 'val_accuracy': 0.528397}}
+2025-05-31 15:11:46,858 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:11:46,863 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:46,863 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:49,255 (client:554) INFO: {'Role': 'Client #2', 'Round': 15, 'Results_raw': {'val_loss': 3521.974609, 'val_total': 2154, 'val_avg_loss': 1.635086, 'val_accuracy': 0.0065}}
+2025-05-31 15:11:49,261 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:11:49,266 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:49,266 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:11:50,842 (client:554) INFO: {'Role': 'Client #3', 'Round': 15, 'Results_raw': {'val_loss': 2694.982422, 'val_total': 1111, 'val_avg_loss': 2.425727, 'val_accuracy': 0.0036}}
+2025-05-31 15:11:53,970 (client:357) INFO: {'Role': 'Client #2', 'Round': 16, 'Results_raw': {'train_loss': 1149.875, 'train_total': 1280, 'train_avg_loss': 0.89834, 'train_accuracy': 0.451562}}
+2025-05-31 15:11:57,117 (client:357) INFO: {'Role': 'Client #1', 'Round': 16, 'Results_raw': {'train_loss': 1327.875, 'train_total': 1280, 'train_avg_loss': 1.037402, 'train_accuracy': 0.469531}}
+2025-05-31 15:12:00,251 (client:357) INFO: {'Role': 'Client #3', 'Round': 16, 'Results_raw': {'train_loss': 990.875, 'train_total': 1280, 'train_avg_loss': 0.774121, 'train_accuracy': 0.582031}}
+2025-05-31 15:12:00,252 (server:616) INFO: {'Role': 'Server #', 'Round': 15, 'Results_weighted_avg': {'val_loss': 5656.78574, 'val_total': 3271.666667, 'val_avg_loss': 1.332467, 'val_accuracy': 0.354457}, 'Results_avg': {'val_loss': 4359.38737, 'val_total': 3271.666667, 'val_avg_loss': 1.702775, 'val_accuracy': 0.179499}, 'Results_fairness': {'val_total': 3271.666667, 'val_loss_std': 1800.980826, 'val_loss_bottom_decile': 2694.982422, 'val_loss_top_decile': 6861.205078, 'val_loss_min': 2694.982422, 'val_loss_max': 6861.205078, 'val_loss_bottom10%': nan, 'val_loss_top10%': 6861.205078, 'val_loss_cos1': 0.924234, 'val_loss_entropy': 1.017216, 'val_avg_loss_std': 0.564686, 'val_avg_loss_bottom_decile': 1.047512, 'val_avg_loss_top_decile': 2.425727, 'val_avg_loss_min': 1.047512, 'val_avg_loss_max': 2.425727, 'val_avg_loss_bottom10%': nan, 'val_avg_loss_top10%': 2.425727, 'val_avg_loss_cos1': 0.949168, 'val_avg_loss_entropy': 1.043184, 'val_accuracy_std': 0.246711, 'val_accuracy_bottom_decile': 0.0036, 'val_accuracy_top_decile': 0.528397, 'val_accuracy_min': 0.0036, 'val_accuracy_max': 0.528397, 'val_accuracy_bottom10%': nan, 'val_accuracy_top10%': 0.528397, 'val_accuracy_cos1': 0.588328, 'val_accuracy_entropy': 0.105373}}
+2025-05-31 15:12:00,253 (logging:237) INFO: Trying to decode this string with json: {"Role": "Server #", "Round": 15, "Results_weighted_avg": {"val_loss": 5656.78574, "val_total": 3271.666667, "val_avg_loss": 1.332467, "val_accuracy": 0.354457}, "Results_avg": {"val_loss": 4359.38737, "val_total": 3271.666667, "val_avg_loss": 1.702775, "val_accuracy": 0.179499}, "Results_fairness": {"val_total": 3271.666667, "val_loss_std": 1800.980826, "val_loss_bottom_decile": 2694.982422, "val_loss_top_decile": 6861.205078, "val_loss_min": 2694.982422, "val_loss_max": 6861.205078, "val_loss_bottom10%": null, "val_loss_top10%": 6861.205078, "val_loss_cos1": 0.924234, "val_loss_entropy": 1.017216, "val_avg_loss_std": 0.564686, "val_avg_loss_bottom_decile": 1.047512, "val_avg_loss_top_decile": 2.425727, "val_avg_loss_min": 1.047512, "val_avg_loss_max": 2.425727, "val_avg_loss_bottom10%": null, "val_avg_loss_top10%": 2.425727, "val_avg_loss_cos1": 0.949168, "val_avg_loss_entropy": 1.043184, "val_accuracy_std": 0.246711, "val_accuracy_bottom_decile": 0.0036, "val_accuracy_top_decile": 0.528397, "val_accuracy_min": 0.0036, "val_accuracy_max": 0.528397, "val_accuracy_bottom10%": null, "val_accuracy_top10%": 0.528397, "val_accuracy_cos1": 0.588328, "val_accuracy_entropy": 0.105373}}
+
+2025-05-31 15:12:00,254 (monitor:248) INFO: After merging the system metrics from all works, we got avg: defaultdict(None, {'id': 'sys_avg', 'sys_avg/fl_end_time_minutes': 0.0, 'sys_avg/total_model_size': '255.49M', 'sys_avg/total_flops': '0.0', 'sys_avg/total_upload_bytes': '0.0', 'sys_avg/total_download_bytes': '1.08M', 'sys_avg/global_convergence_round': 0.0, 'sys_avg/local_convergence_round': 0.0, 'sys_avg/global_convergence_time_minutes': 0.0, 'sys_avg/local_convergence_time_minutes': 0.0})
+2025-05-31 15:12:00,254 (monitor:251) INFO: After merging the system metrics from all works, we got std: defaultdict(None, {'id': 'sys_std', 'sys_std/fl_end_time_minutes': 0.0, 'sys_std/total_model_size': '147.51M', 'sys_std/total_flops': '0.0', 'sys_std/total_upload_bytes': '0.0', 'sys_std/total_download_bytes': '196.89K', 'sys_std/global_convergence_round': 0.0, 'sys_std/local_convergence_round': 0.0, 'sys_std/global_convergence_time_minutes': 0.0, 'sys_std/local_convergence_time_minutes': 0.0})
+2025-05-31 15:12:00,267 (server:344) INFO: Server: Starting evaluation at the end of round 16.
+2025-05-31 15:12:00,272 (server:350) INFO: ----------- Starting a new training round (Round #17) -------------
+2025-05-31 15:12:00,283 (context:296) WARNING: No test_data or test_loader in the trainer, will skip evaluation.If this is not the case you want, please check whether there is typo for the name
+2025-05-31 15:12:00,288 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.
+2025-05-31 15:12:00,288 (context:226) WARNING: cur_mode `test` mismatch mode `val`, will use `val` to calculate `ctx.var`.

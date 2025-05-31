@@ -3,12 +3,11 @@ Name: federatedscope
 Version: 0.3.0
 Summary: Federated learning package
 Home-page: https://github.com/alibaba/FederatedScope
+Download-URL: https://github.com/alibaba/FederatedScope/archive/0.3.0.tar.gz
 Author: Alibaba Damo Academy
 Author-email: jones.wz@alibaba-inc.com
 License: Apache License 2.0
-Download-URL: https://github.com/alibaba/FederatedScope/archive/0.3.0.tar.gz
 Keywords: deep-learning,federated-learning,benchmark
-Platform: UNKNOWN
 Classifier: Development Status :: 4 - Beta
 Classifier: Programming Language :: Python :: 3
 Classifier: Programming Language :: Python :: 3.9
@@ -16,14 +15,14 @@ Classifier: License :: OSI Approved :: Apache Software License
 Classifier: Operating System :: OS Independent
 Requires-Python: >=3.9
 Description-Content-Type: text/markdown
+Provides-Extra: test
 Provides-Extra: app
-Provides-Extra: dev
-Provides-Extra: full
-Provides-Extra: hpo
-Provides-Extra: htl
 Provides-Extra: llm
 Provides-Extra: org
-Provides-Extra: test
+Provides-Extra: dev
+Provides-Extra: hpo
+Provides-Extra: htl
+Provides-Extra: full
 
 # FedSA-LoRA
 
@@ -57,4 +56,3 @@ python federatedscope/main.py --cfg federatedscope/glue/yamls/fedsa-lora.yaml
 ## Acknowledgement
 
 We would like to thank the authors for releasing the public repository: [FederatedScope-LLM](https://github.com/alibaba/FederatedScope/tree/llm).
-

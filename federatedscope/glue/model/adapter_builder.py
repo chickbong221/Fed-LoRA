@@ -45,10 +45,8 @@ def enable_adapter(model, package, adapter, **kwargs):
             model = get_peft_model(model, peft_config)
         # added by me, for rsLoRA
         elif adapter == 'rslora':
-            for i in range(10):
-                print("Using RsLoRA adapter")
-            from peft import RsLoRAConfig
-            peft_config = RsLoRAConfig(task_type=TaskType.SEQ_CLS, **kwargs)
+            from peft import LoraConfig
+            peft_config = LoraConfig(task_type=TaskType.SEQ_CLS, **kwargs)
             model = get_peft_model(model, peft_config)
         elif adapter == 'prefix':
             from peft import PrefixTuningConfig
