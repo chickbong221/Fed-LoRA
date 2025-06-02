@@ -156,9 +156,12 @@ class GLUETrainer(GeneralTorchTrainer):
         }
         # added by me, for GLUE
         glue_metric = load_metric('glue', ctx.cfg.data.type.split('@')[0], trust_remote_code=True)
+        # logger.info(glue_metric)
         eval_metric = glue_metric.compute(predictions=ctx.ys_pred, references=ctx.ys_true)
-        for k, v in eval_metric.items():
-            eval_results[f'{ctx.cur_split}_{k}'] = v
+        # for k, v in eval_metric.items():
+        #     eval_results[f'{ctx.cur_split}_{k}'] = v
+        if 'accuracy' in eval_metric:
+            eval_results[f'{ctx.cur_split}_accuracy'] = eval_metric['accuracy']
         
         setattr(ctx, 'eval_metrics', eval_results)
         

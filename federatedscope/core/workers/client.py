@@ -349,6 +349,7 @@ class Client(BaseClient):
                 if self._cfg.federate.share_local_model and not \
                         self._cfg.federate.online_aggr:
                     model_para_all = copy.deepcopy(model_para_all)
+                # logger.info(results)
                 train_log_res = self._monitor.format_eval_res(
                     results,
                     rnd=self.state,
