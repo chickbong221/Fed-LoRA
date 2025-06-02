@@ -25,6 +25,7 @@ Now, we can fine-tune a LLM with FedSA-LoRA:
 
 ```shell
 python federatedscope/main.py --cfg federatedscope/glue/yamls/fedsa-lora.yaml
+bash federatedscope/glue/yamls/qnli/qnli_sweep.sh
 ```
 
 ## Acknowledgement
