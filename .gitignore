@@ -6,3 +6,4 @@ fedsa-lora_mnli-m.ckpt
 final_fedsa-lora_mnli-m.ckpt
 wandb
 exp
+*__pycache__*
