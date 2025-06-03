@@ -153,6 +153,11 @@ def get_server_cls(cfg):
     if cfg.hpo.fedex.use:
         from federatedscope.autotune.fedex import FedExServer
         return FedExServer
+    # TODO FedExAggServer + Check if FedExAgg belongs to which categories (e.g., autotune, cl)
+    if cfg.hpo.fedex.use:
+        from federatedscope.autotune.fedexagg import FedExAggServer
+        return FedExAggServer
+
 
     if cfg.hpo.fts.use:
         from federatedscope.autotune.fts import FTSServer
