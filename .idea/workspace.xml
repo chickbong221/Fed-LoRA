@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="cdd6300b-a7c8-4278-8674-8f2114d193ba" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/federatedscope/autotune/fedex/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/federatedscope/autotune/fedex/server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/federatedscope/core/aggregators/server_clients_interpolate_aggregator.py" beforeDir="false" afterPath="$PROJECT_DIR$/federatedscope/core/aggregators/server_clients_interpolate_aggregator.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,7 +38,8 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/skydvn/Documents/git/FederatedLearning/Fed-LoRA&quot;
+    &quot;last_opened_file_path&quot;: &quot;/home/skydvn/Documents/git/FederatedLearning/Fed-LoRA&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;
   }
 }</component>
   <component name="SharedIndexes">
