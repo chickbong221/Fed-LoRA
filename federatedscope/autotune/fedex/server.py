@@ -401,6 +401,7 @@ class FedExServer(Server):
                                 train_msg_buffer[client_id][2])
 
                     # Trigger the monitor here (for training)
+                    # FIXME Evaluate the metrics: add the model_metric_dict into Logger
                     self._monitor.calc_model_metric(self.model.state_dict(),
                                                     msg_list,
                                                     rnd=self.state)
