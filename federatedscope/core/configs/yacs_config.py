@@ -23,7 +23,7 @@
         https://github.com/rbgirshick/yacs).
 
     We enhance yacs with more functionalities to support FederatedScope
-    configureation, such as more flexible type conversion, help info,
+    configuration, such as more flexible type conversion, help info,
     allowing required attributes, etc.,
 
 """

@@ -5,9 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cdd6300b-a7c8-4278-8674-8f2114d193ba" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/federatedscope/core/aggregators/exact_lora_aggregator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/federatedscope/autotune/fedex/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/federatedscope/autotune/fedex/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/federatedscope/core/aggregators/server_clients_interpolate_aggregator.py" beforeDir="false" afterPath="$PROJECT_DIR$/federatedscope/core/aggregators/server_clients_interpolate_aggregator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/federatedscope/core/auxiliaries/aggregator_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/federatedscope/core/auxiliaries/aggregator_builder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/federatedscope/core/configs/yacs_config.py" beforeDir="false" afterPath="$PROJECT_DIR$/federatedscope/core/configs/yacs_config.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +47,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-53e2683a6804-9cdd278e9d02-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.26094.141" />
+        <option value="bundled-python-sdk-598b0484d0b5-e2d783800521-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.26927.74" />
       </set>
     </attachedChunks>
   </component>
@@ -83,6 +85,14 @@
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/federatedscope/core/monitors/monitor.py</url>
           <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/federatedscope/core/aggregators/clients_avg_aggregator.py</url>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/federatedscope/glue/model/adapter_builder.py</url>
+          <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

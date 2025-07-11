@@ -368,7 +368,7 @@ class Trainer(BaseTrainer):
 
     def _param_filter(self, state_dict, filter_keywords=None):
         """
-        model parameter filter when transmit between local and gloabl,
+        model parameter filter when transmit between local and global,
         which is useful in personalization.
         e.g., setting cfg.personalization.local_param= ['bn', 'norms']
         indicates the implementation of

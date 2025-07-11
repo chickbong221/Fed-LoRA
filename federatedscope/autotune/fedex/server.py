@@ -412,9 +412,9 @@ class FedExServer(Server):
                         'client_feedback': msg_list,
                         'recover_fun': self.recover_fun
                     }
-                    result = aggregator.aggregate(agg_info)
+                    result = aggregator.aggregate(agg_info) # FIXME Result is the average model
                     model.load_state_dict(result, strict=False)
-                    # aggregator.update(result)
+                    # aggregator.update(result)             # FIXME Load average model -> self.model
 
                 # update the policy
                 self.update_policy(mab_feedbacks)
