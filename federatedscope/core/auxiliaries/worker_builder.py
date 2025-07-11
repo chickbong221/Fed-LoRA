@@ -154,10 +154,6 @@ def get_server_cls(cfg):
         from federatedscope.autotune.fedex import FedExServer
         return FedExServer
     # TODO FedExAggServer + Check if FedExAgg belongs to which categories (e.g., autotune, cl)
-    if cfg.hpo.fedex.use:
-        from federatedscope.autotune.fedexagg import FedExAggServer
-        return FedExAggServer
-
 
     if cfg.hpo.fts.use:
         from federatedscope.autotune.fts import FTSServer
@@ -216,7 +212,15 @@ def get_server_cls(cfg):
     elif server_type == 'fedgc':
         from federatedscope.cl.fedgc.server import GlobalContrastFLServer
         server_class = GlobalContrastFLServer
+    # TODO Fix in the future soon when the fedexagg and fedcaslora are available
+    # elif server_type == 'fedexagg':
+    #     from federatedscope.autotune.fedexagg import FedExAggServer
+    #     return FedExAggServer
+    # elif server_type == 'fedcaslora':
+    #     from federatedscope.autotune.fedexagg import FedExAggServer
+    #     return FedExAggServer
     else:
+        # FIXME FedAvg, pFedMe, DITTO, local
         server_class = Server
 
     if cfg.llm.offsite_tuning.use:

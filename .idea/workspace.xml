@@ -5,11 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cdd6300b-a7c8-4278-8674-8f2114d193ba" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/federatedscope/core/aggregators/exact_lora_aggregator.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/federatedscope/glue/yamls/sst2/fedexagg.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/federatedscope/autotune/fedex/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/federatedscope/autotune/fedex/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/federatedscope/core/auxiliaries/aggregator_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/federatedscope/core/auxiliaries/aggregator_builder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/federatedscope/core/configs/yacs_config.py" beforeDir="false" afterPath="$PROJECT_DIR$/federatedscope/core/configs/yacs_config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/federatedscope/autotune/fedexagg/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/federatedscope/autotune/fedexagg/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/federatedscope/autotune/fedexagg/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/federatedscope/autotune/fedexagg/server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/federatedscope/core/aggregators/exact_lora_aggregator.py" beforeDir="false" afterPath="$PROJECT_DIR$/federatedscope/core/aggregators/exact_lora_aggregator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/federatedscope/core/auxiliaries/worker_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/federatedscope/core/auxiliaries/worker_builder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,6 +31,9 @@
   &quot;associatedIndex&quot;: 0
 }</component>
   <component name="ProjectId" id="2xyvqnVFwRnqqelAqiIx7OB4g6s" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -44,6 +48,11 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/federatedscope/core/workers/FedTuan" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
