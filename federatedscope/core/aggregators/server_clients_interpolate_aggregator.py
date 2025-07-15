@@ -17,11 +17,15 @@ class ServerClientsInterpolateAggregator(ClientsAvgAggregator):
         """
         models = agg_info["client_feedback"]
         global_model = self.model
+
+        # FIXME Debug & guarantee the tuple is in correct form
         elem_each_client = next(iter(models))
         assert len(elem_each_client) == 2, f"Require (sample_size, " \
                                            f"model_para) tuple for each " \
                                            f"client, i.e., len=2, but got " \
                                            f"len={len(elem_each_client)}"
+
+
         avg_model_by_clients = self._para_weighted_avg(models)
         global_local_models = [((1 - self.beta), global_model.state_dict()),
                                (self.beta, avg_model_by_clients)]

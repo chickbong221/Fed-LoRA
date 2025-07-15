@@ -106,6 +106,9 @@ class ATCAggregator(ClientsAvgAggregator):
 
             return round
 
+        else:
+            return None
+
     def _compute_client_groups(self, models):
         tasks = [None for _ in range(self.client_num)]
 

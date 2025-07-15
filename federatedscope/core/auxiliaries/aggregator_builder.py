@@ -33,7 +33,8 @@ def get_aggregator(method, model=None, device=None, online=False, config=None):
         ``core.aggregators.OnlineClientsAvgAggregator`` or \
         ``core.aggregators.AsynClientsAvgAggregator`` or \
         ``ClientsAvgAggregator``
-        ``pfedme``                          \
+        *** ``pfedme``:                         \
+        *** Line 10 of algo. 1 of https://arxiv.org/pdf/2006.08848 \
         ``core.aggregators.ServerClientsInterpolateAggregator``
         ``ditto``                           \
         ``core.aggregators.OnlineClientsAvgAggregator`` or \

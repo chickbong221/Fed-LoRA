@@ -401,6 +401,8 @@ class FedExServer(Server):
                                 train_msg_buffer[client_id][2])
 
                     # Trigger the monitor here (for training)
+                    # FIXME Evaluate the metrics: add the model_metric_dict into Logger
+                    # FIXME Only msg_list is taken to evaluate
                     self._monitor.calc_model_metric(self.model.state_dict(),
                                                     msg_list,
                                                     rnd=self.state)
@@ -410,9 +412,9 @@ class FedExServer(Server):
                         'client_feedback': msg_list,
                         'recover_fun': self.recover_fun
                     }
-                    result = aggregator.aggregate(agg_info)
+                    result = aggregator.aggregate(agg_info) # FIXME Result is the average model
                     model.load_state_dict(result, strict=False)
-                    # aggregator.update(result)
+                    # aggregator.update(result)             # FIXME Load average model -> self.model
 
                 # update the policy
                 self.update_policy(mab_feedbacks)
