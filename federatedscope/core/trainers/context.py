@@ -223,13 +223,14 @@ class Context(LifecycleDict):
 
     def _calculate_batch_epoch_num(self, mode='train'):
         if self.cur_mode is not None and self.cur_mode != mode:
-            logger.warning(
-                f'cur_mode `{self.cur_mode}` mismatch mode `{mode}`, '
-                f'will use `{mode}` to calculate `ctx.var`.')
+            pass
+            # logger.warning(
+            #     f'cur_mode `{self.cur_mode}` mismatch mode `{mode}`, '
+            #     f'will use `{mode}` to calculate `ctx.var`.')
         if self.cur_split is None:
-            logger.warning(
-                f'cur_split `{self.cur_split}` not found in data_split, '
-                f'will use `train` split to calculate `ctx.var`.')
+            # logger.warning(
+            #     f'cur_split `{self.cur_split}` not found in data_split, '
+            #     f'will use `train` split to calculate `ctx.var`.')
             cur_split = 'train'
         else:
             cur_split = self.cur_split
@@ -293,12 +294,12 @@ class Context(LifecycleDict):
         if self.get(f"{target_split_name}_data") is None and self.get(
                 f"{target_split_name}_loader") is None:
             if skip:
-                logger.warning(
-                    f"No {target_split_name}_data or"
-                    f" {target_split_name}_loader in the trainer, "
-                    f"will skip evaluation."
-                    f"If this is not the case you want, please check "
-                    f"whether there is typo for the name")
+                # logger.warning(
+                #     f"No {target_split_name}_data or"
+                #     f" {target_split_name}_loader in the trainer, "
+                #     f"will skip evaluation."
+                #     f"If this is not the case you want, please check "
+                #     f"whether there is typo for the name")
                 return False
             else:
                 raise ValueError(f"No {target_split_name}_data or"

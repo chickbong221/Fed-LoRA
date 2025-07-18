@@ -1,5 +1,8 @@
 import os
 import sys
+import warnings
+
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 DEV_MODE = False  # simplify the federatedscope re-setup everytime we change

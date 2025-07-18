@@ -15,6 +15,8 @@ from federatedscope.core.aggregators.bulyan_aggregator import \
     BulyanAggregator
 from federatedscope.core.aggregators.normbounding_aggregator import \
     NormboundingAggregator
+from federatedscope.core.aggregators.exact_lora_aggregator import \
+    ExactClientsAggregator
 
 __all__ = [
     'Aggregator',
@@ -29,4 +31,5 @@ __all__ = [
     'TrimmedmeanAggregator',
     'BulyanAggregator',
     'NormboundingAggregator',
+    'ExactClientsAggregator'
 ]

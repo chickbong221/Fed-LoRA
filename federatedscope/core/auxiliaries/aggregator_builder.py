@@ -58,7 +58,7 @@ def get_aggregator(method, model=None, device=None, online=False, config=None):
     else:
         from federatedscope.core.aggregators import ClientsAvgAggregator, \
             OnlineClientsAvgAggregator, ServerClientsInterpolateAggregator, \
-            FedOptAggregator, NoCommunicationAggregator, \
+            FedOptAggregator, NoCommunicationAggregator, ExactClientsAggregator, \
             AsynClientsAvgAggregator, KrumAggregator, \
             MedianAggregator, TrimmedmeanAggregator, \
             BulyanAggregator,  NormboundingAggregator
@@ -87,6 +87,10 @@ def get_aggregator(method, model=None, device=None, online=False, config=None):
 
     if config.fedopt.use or aggregator_type == 'fedopt':
         return FedOptAggregator(config=config, model=model, device=device)
+    
+    if aggregator_type == 'exact_lora':
+        return ExactClientsAggregator(config=config, model=model, device=device)
+
     elif aggregator_type == 'clients_avg':
         if online:
             return OnlineClientsAvgAggregator(

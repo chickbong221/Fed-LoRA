@@ -239,8 +239,8 @@ class CN(CfgNode):
                             "package")
                         exit()
 
-            if inform:
-                logger.info("the used configs are: \n" + str(tmp_cfg))
+            # if inform:
+            #     logger.info("the used configs are: \n" + str(tmp_cfg))
 
 
 # to ensure the sub-configs registered before set up the global config

@@ -32,6 +32,8 @@ class ExactClientsAggregator(Aggregator):
             'recover_fun' in agg_info and self.cfg.federate.use_ss) else None
 
         # TODO 2. Split grad_A and grad_B
+        print(models[0][1].keys())
+
         """
         lora_A_list = []
         lora_B_list = []
@@ -128,7 +130,7 @@ class ExactClientsAggregator(Aggregator):
         return avg_model
 
 
-class OnlineClientsAvgAggregator(ClientsAvgAggregator):
+class OnlineExactClientsAggregator(ExactClientsAggregator):
     """
     Implementation of online aggregation of FedAvg.
     """
@@ -137,7 +139,7 @@ class OnlineClientsAvgAggregator(ClientsAvgAggregator):
                  device='cpu',
                  src_device='cpu',
                  config=None):
-        super(OnlineClientsAvgAggregator, self).__init__(model, device, config)
+        super(OnlineExactClientsAggregator, self).__init__(model, device, config)
         self.src_device = src_device
 
     def reset(self):

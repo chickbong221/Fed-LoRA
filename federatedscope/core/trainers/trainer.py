@@ -348,23 +348,23 @@ class Trainer(BaseTrainer):
         preserved_paras = self._param_filter(self.ctx.model.state_dict())
         preserved_para_names = set(preserved_paras.keys())
         filtered_para_names = ori_para_names - preserved_para_names
-        logger.info(f"Num of original para names: {len(ori_para_names)}.")
-        logger.info(f"Num of original trainable para names:"
-                    f" {len(self.ctx['trainable_para_names'])}.")
-        logger.info(
-            f"Num of preserved para names in local update:"
-            f" {len(preserved_para_names)}. \n"
-            f"Preserved para names in local update: {preserved_para_names}.")
-        logger.info(
-            f"Num of filtered para names in local update:"
-            f" {len(filtered_para_names)}. \n"
-            f"Filtered para names in local update: {filtered_para_names}.")
+        # logger.info(f"Num of original para names: {len(ori_para_names)}.")
+        # logger.info(f"Num of original trainable para names:"
+        #             f" {len(self.ctx['trainable_para_names'])}.")
+        # logger.info(
+        #     f"Num of preserved para names in local update:"
+        #     f" {len(preserved_para_names)}. \n"
+        #     f"Preserved para names in local update: {preserved_para_names}.")
+        # logger.info(
+        #     f"Num of filtered para names in local update:"
+        #     f" {len(filtered_para_names)}. \n"
+        #     f"Filtered para names in local update: {filtered_para_names}.")
 
-        logger.info(f"After register default hooks,\n"
-                    f"\tthe hooks_in_train is:\n\t"
-                    f"{format_log_hooks(self.hooks_in_train)};\n"
-                    f"\tthe hooks_in_eval is:\n\
-            t{format_log_hooks(self.hooks_in_eval)}")
+        # logger.info(f"After register default hooks,\n"
+        #             f"\tthe hooks_in_train is:\n\t"
+        #             f"{format_log_hooks(self.hooks_in_train)};\n"
+        #             f"\tthe hooks_in_eval is:\n\
+        #     t{format_log_hooks(self.hooks_in_eval)}")
 
     def _param_filter(self, state_dict, filter_keywords=None):
         """

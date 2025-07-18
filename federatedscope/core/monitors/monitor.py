@@ -713,7 +713,7 @@ class Monitor(object):
                             for mode in ['train', 'val', 'test']:
                                 if mode in key:
                                     _key = key.split(f'{mode}_')[1]
-                                    print(_key)
+                                    # print(_key)
                                     if self.metric_calculator.eval_metric[
                                             _key][1]:
                                         cur_result = max(cur_result)

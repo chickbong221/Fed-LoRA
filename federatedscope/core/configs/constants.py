@@ -14,6 +14,7 @@ AGGREGATOR_TYPE = {
     "global": "no_communication",  # only one client locally train all data,
     # i.e., totally global training
     "fedavg": "clients_avg",  # FedAvg
+    "exact_lora": "exact_lora",  # Exact LoRA
     "pfedme": "server_clients_interpolation",  # pFedMe,  + server-clients
     # interpolation
     "ditto": "clients_avg",  # Ditto
