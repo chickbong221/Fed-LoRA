@@ -1,5 +1,7 @@
 import os
 import torch
+import torch.nn as nn
+import torch.optim as optim
 from federatedscope.core.aggregators import Aggregator
 from federatedscope.core.auxiliaries.utils import param2tensor
 
@@ -32,8 +34,7 @@ class ExactClientsAggregator(Aggregator):
             'recover_fun' in agg_info and self.cfg.federate.use_ss) else None
 
         # TODO 2. Split grad_A and grad_B
-        print(models[0][1].keys())
-
+        print(f"Model num: {len(models)}")
         """
         lora_A_list = []
         lora_B_list = []
@@ -63,6 +64,21 @@ class ExactClientsAggregator(Aggregator):
         
         - And we will change the function in Line 265 and Line 322-327
         """
+        # avg_model = self._para_weighted_avg(models, recover_fun=recover_fun)
+        # avg_model_2 = self._lora_weighted_avg(models, recover_fun=recover_fun)
+
+        # # Test if avg_model and avg_model_2 are approximately equal
+        # for key in avg_model:
+        #     if key in avg_model_2:
+        #         tensor1 = avg_model[key].detach()
+        #         tensor2 = avg_model_2[key].detach()
+        #         if not torch.allclose(tensor1, tensor2, rtol=1e-3, atol=1e-3):
+        #             raise ValueError(
+        #                 f"Mismatch in aggregated parameters for {key}:\n"
+        #                 f"Max diff: {(tensor1 - tensor2).abs().max()}\n"
+        #                 f"{tensor1} vs {tensor2}"
+        #             )
+
         avg_model = self._para_weighted_avg(models, recover_fun=recover_fun)
 
         return avg_model
@@ -92,42 +108,142 @@ class ExactClientsAggregator(Aggregator):
 
     def _para_weighted_avg(self, models, recover_fun=None):
         """
-        Calculates the weighted average of models.
+        Apply Exact LoRA scaling using U, V for each client,
+        then calculate the weighted average of models.
         """
-        training_set_size = 0
-        for i in range(len(models)):
-            sample_size, _ = models[i]
-            training_set_size += sample_size
+        A_all, B_all = self.extract_lora_AB(models)
+        U, V = self.optimize_uv(A_all, B_all, lr=1e-2, steps=50)
+
+        num_clients = len(models)
+        training_set_size = sum(sample_size for sample_size, _ in models)
 
         sample_size, avg_model = models[0]
+
         for key in avg_model:
-            for i in range(len(models)):
+            for i in range(num_clients):
                 local_sample_size, local_model = models[i]
 
                 if self.cfg.federate.ignore_weight:
-                    weight = 1.0 / len(models)
+                    weight = 1.0 / num_clients
                 elif self.cfg.federate.use_ss:
-                    # When using secret sharing, what the server receives
-                    # are sample_size * model_para
                     weight = 1.0
                 else:
                     weight = local_sample_size / training_set_size
 
                 if not self.cfg.federate.use_ss:
                     local_model[key] = param2tensor(local_model[key])
-                if i == 0:
-                    avg_model[key] = local_model[key] * weight
-                else:
-                    avg_model[key] += local_model[key] * weight
 
+                # Scale with U[i] or V[i] if key contains lora_A or lora_B
+                scaled_tensor = local_model[key]
+                if "lora_A" in key:
+                    scaled_tensor = U[i] * scaled_tensor
+                elif "lora_B" in key:
+                    scaled_tensor = V[i] * scaled_tensor
+
+                if i == 0:
+                    avg_model[key] = scaled_tensor * weight
+                else:
+                    avg_model[key] += scaled_tensor * weight
+
+            # Secret sharing post-processing
             if self.cfg.federate.use_ss and recover_fun:
                 avg_model[key] = recover_fun(avg_model[key])
-                # When using secret sharing, what the server receives are
-                # sample_size * model_para
                 avg_model[key] /= training_set_size
                 avg_model[key] = torch.FloatTensor(avg_model[key])
 
         return avg_model
+
+
+    # Test if exacting LoRA parameters is correct
+    # def _lora_weighted_avg(self, models, recover_fun=None):
+    #     total_size = sum(sample_size for sample_size, _ in models)
+    #     _, reference_model = models[0]
+
+    #     avg_lora = {}
+
+    #     for key in reference_model:
+    #         if "lora_A" not in key and "lora_B" not in key:
+    #             continue  # skip non-LoRA parameters
+
+    #         for i, (sample_size, local_model) in enumerate(models):
+    #             # Decide weight
+    #             if self.cfg.federate.ignore_weight:
+    #                 weight = 1.0 / len(models)
+    #             elif self.cfg.federate.use_ss:
+    #                 weight = 1.0  # assume client already multiplies by sample_size
+    #             else:
+    #                 weight = sample_size / total_size
+
+    #             param = local_model[key]
+    #             if not self.cfg.federate.use_ss:
+    #                 param = param2tensor(param)
+
+    #             if i == 0:
+    #                 avg_lora[key] = param * weight
+    #             else:
+    #                 avg_lora[key] += param * weight
+
+    #         # If using secret sharing
+    #         if self.cfg.federate.use_ss and recover_fun:
+    #             avg_lora[key] = recover_fun(avg_lora[key])
+    #             avg_lora[key] /= total_size
+    #             avg_lora[key] = torch.FloatTensor(avg_lora[key])
+
+    #     return avg_lora
+
+    def optimize_uv(self, A_all, B_all, lr=1e-2, steps=50):
+        num_clients = A_all.shape[0]
+
+        U = torch.nn.Parameter(torch.ones(num_clients, device=self.device))
+        V = torch.nn.Parameter(torch.ones(num_clients, device=self.device))
+
+        optimizer = torch.optim.SGD([U, V], lr=lr)
+
+        for step in range(steps):
+            optimizer.zero_grad()
+
+            UA = (U.view(-1, 1, 1, 1) * A_all).mean(dim=0)  # [num_layers, ...]
+            VB = (V.view(-1, 1, 1, 1) * B_all).mean(dim=0)
+            
+            BA = (torch.matmul(B_all, A_all)).mean(dim=0)
+
+            loss = (torch.matmul(VB, UA).sum() - BA.sum()) ** 2
+            print(torch.matmul(VB, UA).sum(), BA.sum())
+            
+            loss.backward()
+            optimizer.step()
+
+            if step % 10 == 0:
+                print(f"Step {step}: Loss = {loss.item():.6f}")
+
+        return U.squeeze(), V.squeeze()  # shape: [num_clients]
+
+
+    def extract_lora_AB(self, models):
+        A_all = []
+        B_all = []
+
+        for i in range(0, len(models)):
+            _, state_dict = models[i]
+
+            A_list = []
+            B_list = []
+            for name, param in state_dict.items():
+                if "lora_A" in name:
+                    A_list.append(param.detach().clone())
+                elif "lora_B" in name:
+                    B_list.append(param.detach().clone())
+
+            A_list = sorted(A_list, key=lambda x: x.shape)
+            B_list = sorted(B_list, key=lambda x: x.shape)
+
+            A_all.append(torch.stack(A_list))  # shape: [num_layers, ...]
+            B_all.append(torch.stack(B_list))
+
+        A_all = torch.stack(A_all)  # shape: [num_clients, num_layers, ...]
+        B_all = torch.stack(B_all)
+
+        return A_all, B_all
 
 
 class OnlineExactClientsAggregator(ExactClientsAggregator):
