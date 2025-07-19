@@ -112,7 +112,7 @@ class ExactClientsAggregator(Aggregator):
         then calculate the weighted average of models.
         """
         A_all, B_all = self.extract_lora_AB(models)
-        U, V = self.optimize_uv(A_all, B_all, lr=1e-2, steps=50)
+        U, V = self.optimize_uv(A_all, B_all, lr=1e-2, steps=500)
 
         num_clients = len(models)
         training_set_size = sum(sample_size for sample_size, _ in models)
@@ -210,8 +210,10 @@ class ExactClientsAggregator(Aggregator):
             VB = (V.view(-1, 1, 1, 1) * B_all).mean(dim=0)
             naive_update = torch.matmul(VB, UA)  # [num_layers, ...]
 
-            loss = (naive_update.sum() - ideal_update.sum()) ** 2
-            print(naive_update.sum(), ideal_update.sum())
+            loss = torch.abs(naive_update.sum() - ideal_update.sum())
+
+            # print(naive_update.sum(), ideal_update.sum())
+            # print(loss)
             
             loss.backward()
             optimizer.step()
