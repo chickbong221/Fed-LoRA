@@ -34,7 +34,7 @@ class ExactClientsAggregator(Aggregator):
             'recover_fun' in agg_info and self.cfg.federate.use_ss) else None
 
         # TODO 2. Split grad_A and grad_B
-        print(f"Model num: {len(models)}")
+        # print(f"model keys: {models[0][1].keys()}")
         """
         lora_A_list = []
         lora_B_list = []
@@ -193,6 +193,10 @@ class ExactClientsAggregator(Aggregator):
 
     def optimize_uv(self, A_all, B_all, lr=1e-2, steps=50):
         num_clients = A_all.shape[0]
+        BA = []
+        for i in range(len(A_all)):
+            BA.append(torch.matmul(B_all[i], A_all[i]))
+        ideal_update = torch.stack(BA).mean(dim=0)
 
         U = torch.nn.Parameter(torch.ones(num_clients, device=self.device))
         V = torch.nn.Parameter(torch.ones(num_clients, device=self.device))
@@ -204,11 +208,10 @@ class ExactClientsAggregator(Aggregator):
 
             UA = (U.view(-1, 1, 1, 1) * A_all).mean(dim=0)  # [num_layers, ...]
             VB = (V.view(-1, 1, 1, 1) * B_all).mean(dim=0)
-            
-            BA = (torch.matmul(B_all, A_all)).mean(dim=0)
+            naive_update = torch.matmul(VB, UA)  # [num_layers, ...]
 
-            loss = (torch.matmul(VB, UA).sum() - BA.sum()) ** 2
-            print(torch.matmul(VB, UA).sum(), BA.sum())
+            loss = (naive_update.sum() - ideal_update.sum()) ** 2
+            print(naive_update.sum(), ideal_update.sum())
             
             loss.backward()
             optimizer.step()
@@ -230,6 +233,7 @@ class ExactClientsAggregator(Aggregator):
             B_list = []
             for name, param in state_dict.items():
                 if "lora_A" in name:
+                    # print(f"Extracting {name} with shape {param}")
                     A_list.append(param.detach().clone())
                 elif "lora_B" in name:
                     B_list.append(param.detach().clone())
