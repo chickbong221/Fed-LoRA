@@ -12,11 +12,12 @@ federate:
   share_local_model: True
   online_aggr: False
   method: 'exact_lora'
+  make_global_eval: False
 personalization: 
-  local_param: ['classifier']
+  local_param: []
 data:
   root: data/
-  type: 'mnli@glue'
+  type: 'rte@glue'
   matched: True
   splitter: 'lda'
   splitter_args: [{'alpha': 0.5}]
@@ -35,7 +36,7 @@ train:
   local_update_steps: 10
   batch_or_epoch: batch
   optimizer:
-    lr: 2e-2
+    lr: 1e-2
   is_enable_half: True
 criterion:
   type: CrossEntropyLoss

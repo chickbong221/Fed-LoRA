@@ -933,6 +933,7 @@ class Server(BaseServer):
         """
 
         if self._cfg.federate.make_global_eval:
+            print("Hello, This should be a global evaluation")
             # By default, the evaluation is conducted one-by-one for all
             # internal models;
             # for other cases such as ensemble, override the eval function

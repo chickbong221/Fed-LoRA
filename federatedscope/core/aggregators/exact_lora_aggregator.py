@@ -112,7 +112,7 @@ class ExactClientsAggregator(Aggregator):
         then calculate the weighted average of models.
         """
         A_all, B_all = self.extract_lora_AB(models)
-        U, V = self.optimize_uv(A_all, B_all, lr=1e-2, steps=500)
+        U, V = self.optimize_uv(A_all, B_all, lr=5e-2, steps=50)
 
         num_clients = len(models)
         training_set_size = sum(sample_size for sample_size, _ in models)
@@ -153,45 +153,7 @@ class ExactClientsAggregator(Aggregator):
 
         return avg_model
 
-
-    # Test if exacting LoRA parameters is correct
-    # def _lora_weighted_avg(self, models, recover_fun=None):
-    #     total_size = sum(sample_size for sample_size, _ in models)
-    #     _, reference_model = models[0]
-
-    #     avg_lora = {}
-
-    #     for key in reference_model:
-    #         if "lora_A" not in key and "lora_B" not in key:
-    #             continue  # skip non-LoRA parameters
-
-    #         for i, (sample_size, local_model) in enumerate(models):
-    #             # Decide weight
-    #             if self.cfg.federate.ignore_weight:
-    #                 weight = 1.0 / len(models)
-    #             elif self.cfg.federate.use_ss:
-    #                 weight = 1.0  # assume client already multiplies by sample_size
-    #             else:
-    #                 weight = sample_size / total_size
-
-    #             param = local_model[key]
-    #             if not self.cfg.federate.use_ss:
-    #                 param = param2tensor(param)
-
-    #             if i == 0:
-    #                 avg_lora[key] = param * weight
-    #             else:
-    #                 avg_lora[key] += param * weight
-
-    #         # If using secret sharing
-    #         if self.cfg.federate.use_ss and recover_fun:
-    #             avg_lora[key] = recover_fun(avg_lora[key])
-    #             avg_lora[key] /= total_size
-    #             avg_lora[key] = torch.FloatTensor(avg_lora[key])
-
-    #     return avg_lora
-
-    def optimize_uv(self, A_all, B_all, lr=1e-2, steps=50):
+    def optimize_uv(self, A_all, B_all, lr=5e-3, steps=50):
         num_clients = A_all.shape[0]
         BA = []
         for i in range(len(A_all)):

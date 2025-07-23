@@ -11,6 +11,7 @@ federate:
   save_to: "fedsa-lora_mnli-m.ckpt"
   share_local_model: True
   online_aggr: False
+  make_global_eval: True
 personalization: 
   local_param: ['lora_B', 'classifier']
 data:

@@ -285,8 +285,11 @@ class Monitor(object):
             try:
                 import wandb
                 exp_stop_normal = False
+                print("Before logline_2_wandb_dict")
                 exp_stop_normal, log_res = logline_2_wandb_dict(
                     exp_stop_normal, line, self.log_res_best, raw_out=False)
+                print("After logline_2_wandb_dict")
+                # print("log_res", log_res)
                 wandb.log(log_res)
             except ImportError:
                 logger.error(
