@@ -399,6 +399,8 @@ class GeneralTorchTrainer(Trainer):
         if ctx.scheduler is not None:
             ctx.scheduler.step()
 
+        print("Hooking on backward")
+
     def _hook_on_batch_end(self, ctx):
         """
         Note:

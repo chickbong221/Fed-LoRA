@@ -621,7 +621,7 @@ class Server(BaseServer):
                     results_type="unseen_client_best_individual"
                     if merge_type == "unseen" else "client_best_individual")
 
-                self._monitor.save_formatted_results(formatted_logs)
+                # self._monitor.save_formatted_results(formatted_logs)
 
                 update_prior = -1  # Bigger the higher priority
                 update_prior_list = ['fairness', 'avg', 'weighted_avg']

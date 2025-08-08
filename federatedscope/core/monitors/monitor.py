@@ -21,6 +21,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+# print("Initializing global_all_monitors")
 global_all_monitors = [
 ]  # used in standalone mode, to merge sys metric results for all workers
 
@@ -285,10 +286,10 @@ class Monitor(object):
             try:
                 import wandb
                 exp_stop_normal = False
-                print("Before logline_2_wandb_dict")
+                # print("Before logline_2_wandb_dict")
                 exp_stop_normal, log_res = logline_2_wandb_dict(
                     exp_stop_normal, line, self.log_res_best, raw_out=False)
-                print("After logline_2_wandb_dict")
+                # print("After logline_2_wandb_dict")
                 # print("log_res", log_res)
                 wandb.log(log_res)
             except ImportError:

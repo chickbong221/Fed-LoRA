@@ -97,7 +97,7 @@ class Context(LifecycleDict):
           Model-related attributes
           - ``ctx.model``: the model used
           - ``ctx.models``: the multi models if use
-          - ``ctx.mirrored_models``: the mirrored models
+          - ``ctx.  ``: the mirrored models
           - ``ctx.trainable_para_names``: the trainable parameter names of \
           the model
         Optimizer-related attributes

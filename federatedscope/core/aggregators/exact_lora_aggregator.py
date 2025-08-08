@@ -4,6 +4,8 @@ import torch.nn as nn
 import torch.optim as optim
 from federatedscope.core.aggregators import Aggregator
 from federatedscope.core.auxiliaries.utils import param2tensor
+import torch.nn.functional as F
+import itertools
 
 # TODO 1. Fix all of the value names of FedAvg -> FedExAgg
 class ExactClientsAggregator(Aggregator):
@@ -112,7 +114,24 @@ class ExactClientsAggregator(Aggregator):
         then calculate the weighted average of models.
         """
         A_all, B_all = self.extract_lora_AB(models)
-        U, V = self.optimize_uv(A_all, B_all, lr=5e-2, steps=50)
+
+        A_all_copy = A_all.clone()
+        B_all_copy = B_all.clone()
+
+        value = A_all_copy[0].norm(p=2).item()
+        print(f"{value:.10f}")
+
+
+        # print(f"Shape of A_all: {A_all.shape}")
+
+        # print(A_all_copy.norm(p=2))
+
+        diffs = self.compute_pairwise_mse(A_all_copy, B_all_copy)
+
+        # for (i, j), vals in diffs.items():
+        #     print(f"Client pair ({i}, {j}): MSE_A = {vals['mse_A']}, MSE_B = {vals['mse_B']}, Total = {vals['total']}")
+        
+        U, V = self.optimize_uv(A_all, B_all, lr=5e-3, steps=100)
 
         num_clients = len(models)
         training_set_size = sum(sample_size for sample_size, _ in models)
@@ -135,6 +154,7 @@ class ExactClientsAggregator(Aggregator):
 
                 # Scale with U[i] or V[i] if key contains lora_A or lora_B
                 scaled_tensor = local_model[key]
+                # print(U[i].device, V[i].device, scaled_tensor.device)
                 if "lora_A" in key:
                     scaled_tensor = U[i] * scaled_tensor
                 elif "lora_B" in key:
@@ -154,36 +174,53 @@ class ExactClientsAggregator(Aggregator):
         return avg_model
 
     def optimize_uv(self, A_all, B_all, lr=5e-3, steps=50):
+
+        A_all = A_all.to(self.device)
+        B_all = B_all.to(self.device)
+
         num_clients = A_all.shape[0]
         BA = []
+
         for i in range(len(A_all)):
             BA.append(torch.matmul(B_all[i], A_all[i]))
         ideal_update = torch.stack(BA).mean(dim=0)
+        # print(ideal_update)
 
         U = torch.nn.Parameter(torch.ones(num_clients, device=self.device))
         V = torch.nn.Parameter(torch.ones(num_clients, device=self.device))
 
         optimizer = torch.optim.SGD([U, V], lr=lr)
 
-        for step in range(steps):
-            optimizer.zero_grad()
+        # for step in range(steps):
+        #     optimizer.zero_grad()
 
-            UA = (U.view(-1, 1, 1, 1) * A_all).mean(dim=0)  # [num_layers, ...]
-            VB = (V.view(-1, 1, 1, 1) * B_all).mean(dim=0)
-            naive_update = torch.matmul(VB, UA)  # [num_layers, ...]
+        #     UA = (U.view(-1, 1, 1, 1) * A_all).mean(dim=0)  # [num_layers, ...]
+        #     VB = (V.view(-1, 1, 1, 1) * B_all).mean(dim=0)
+        #     naive_update = torch.matmul(VB, UA)  # [num_layers, ...]
 
-            loss = torch.abs(naive_update.sum() - ideal_update.sum())
-
-            # print(naive_update.sum(), ideal_update.sum())
-            # print(loss)
+        #     # print(naive_update)
+        #     # loss_fn = torch.nn.L1Loss()
+        #     # loss = loss_fn(naive_update, ideal_update)
+        #     loss = torch.mean((naive_update - ideal_update) ** 2) 
             
-            loss.backward()
-            optimizer.step()
+        #     loss.backward()
+        #     optimizer.step()
 
-            if step % 10 == 0:
-                print(f"Step {step}: Loss = {loss.item():.6f}")
+        #     if step % 10 == 0:
+        #         print(f"Step {step}: Loss = {loss.item()}")
 
-        return U.squeeze(), V.squeeze()  # shape: [num_clients]
+        # UA = (U.view(-1, 1, 1, 1) * A_all).mean(dim=0)  # [num_layers, ...]
+        # VB = (V.view(-1, 1, 1, 1) * B_all).mean(dim=0)
+        # naive_update = torch.matmul(VB, UA)  # [num_layers, ...]
+
+        # # loss_fn = torch.nn.MSELoss()
+        # # loss_fn = torch.nn.L1Loss()
+        # # loss = loss_fn(naive_update, ideal_update)
+        # loss = torch.mean((naive_update - ideal_update) ** 2)
+
+        # print(f"Loss = {loss.item()}")
+
+        return U.detach().squeeze().cpu(), V.detach().squeeze().cpu()  # shape: [num_clients]
 
 
     def extract_lora_AB(self, models):
@@ -195,6 +232,7 @@ class ExactClientsAggregator(Aggregator):
 
             A_list = []
             B_list = []
+
             for name, param in state_dict.items():
                 if "lora_A" in name:
                     # print(f"Extracting {name} with shape {param}")
@@ -211,7 +249,55 @@ class ExactClientsAggregator(Aggregator):
         A_all = torch.stack(A_all)  # shape: [num_clients, num_layers, ...]
         B_all = torch.stack(B_all)
 
+        # norm_A = A_all.norm(p=2)  # scalar
+        # norm_B = B_all.norm(p=2)
+
+        # print(f"Norm of A_all: {norm_A.item()}, Norm of B_all: {norm_B.item()}")
+        # print(f"Shape of A_all: {A_all.shape}, Shape of B_all: {B_all.shape}")
+        # print(f"Max-Min of A_all: {A_all.min()}, {A_all.max()}")
+        # print(f"Max-Min of B_all: {B_all.min()}, {B_all.max()}")
+
+        def normalize_minmax(tensor):
+            min_val = tensor.min()
+            max_val = tensor.max()
+            return (tensor - min_val) / (max_val - min_val + 1e-8)
+
+        def normalize_l2(tensor):
+            norm = tensor.norm(p=2)
+            return tensor / (norm + 1e-8)
+
+        # A_all = normalize_minmax(A_all)
+        # B_all = normalize_minmax(B_all)
+
+        # A_all = normalize_l2(A_all)
+        # B_all = normalize_l2(B_all)
+
+        # norm_A = A_all.norm(p=2)  # scalar
+        # norm_B = B_all.norm(p=2)
+
+        # print(f"Norm of A_all after nor: {norm_A.item()}, Norm of B_all after nor: {norm_B.item()}")
+        # print(f"Shape of A_all after nor: {A_all.shape}, Shape of B_all after nor: {B_all.shape}")
+
         return A_all, B_all
+
+    def compute_pairwise_mse(self, A_all, B_all):
+        num_clients = A_all.shape[0]
+        pairwise_mse = {}
+
+        for i, j in itertools.combinations(range(num_clients), 2):
+
+            mse_A = F.mse_loss(A_all[i], A_all[j])
+            mse_B = F.mse_loss(B_all[i], B_all[j])
+            
+            total_mse = mse_A + mse_B
+
+            pairwise_mse[(i, j)] = {
+                'mse_A': mse_A.item(),
+                'mse_B': mse_B.item(),
+                'total': total_mse.item()
+            }
+
+        return pairwise_mse
 
 
 class OnlineExactClientsAggregator(ExactClientsAggregator):

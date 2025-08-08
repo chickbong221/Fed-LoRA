@@ -1,6 +1,9 @@
 import torch
 import torch.nn as nn
 from collections import OrderedDict
+import copy
+import itertools
+import torch.nn.functional as F
 
 
 def enable_adapter(model, package, adapter, **kwargs):
@@ -33,11 +36,92 @@ def enable_adapter(model, package, adapter, **kwargs):
             Prompt Tuning
             AdaLoRA
         """
+
+        A_all = []
+        B_all = []
+
+        def compute_pairwise_mse(A_all, B_all):
+            num_clients = A_all.shape[0]
+            pairwise_mse = {}
+
+            for i, j in itertools.combinations(range(num_clients), 2):
+
+                mse_A = F.mse_loss(A_all[i], A_all[j])
+                mse_B = F.mse_loss(B_all[i], B_all[j])
+                total_mse = mse_A + mse_B
+
+                pairwise_mse[(i, j)] = {
+                    'mse_A': mse_A.item(),
+                    'mse_B': mse_B.item(),
+                    'total': total_mse.item()
+                }
+
+            return pairwise_mse
+
+        def extract_lora_matrices(model):
+            state_dict = model.state_dict()
+
+            A_list = []
+            B_list = []
+            for name, param in state_dict.items():
+                if "lora_A" in name:
+                    # print(f"Extracting {name} with shape {param}")
+                    A_list.append(param.detach().clone())
+                elif "lora_B" in name:
+                    B_list.append(param.detach().clone())
+
+            A_list = sorted(A_list, key=lambda x: x.shape)
+            B_list = sorted(B_list, key=lambda x: x.shape)
+
+            return A_list, B_list
+            
         from peft import get_peft_model, TaskType
         if adapter == 'lora':
             from peft import LoraConfig
             peft_config = LoraConfig(task_type=TaskType.SEQ_CLS, **kwargs)
             model = get_peft_model(model, peft_config)
+
+            # model_toy1 = copy.deepcopy(model)
+            # model_toy2 = copy.deepcopy(model)
+
+            # model_toy1 = get_peft_model(model_toy1, peft_config)
+            # model_toy2 = get_peft_model(model_toy2, peft_config)
+
+            # A_list, B_list = extract_lora_matrices(model_toy1)
+            # A_all.append(torch.stack(A_list))
+            # B_all.append(torch.stack(B_list))
+
+            # A_list, B_list = extract_lora_matrices(model_toy2)
+            # A_all.append(torch.stack(A_list))
+            # B_all.append(torch.stack(B_list))
+
+            # A_all = torch.stack(A_all)
+            # B_all = torch.stack(B_all)
+
+            # diffs = compute_pairwise_mse(A_all, B_all)
+
+            # for (i, j), vals in diffs.items():
+            #     print(f"Client pair ({i}, {j}): MSE_A = {vals['mse_A']}, MSE_B = {vals['mse_B']}, Total = {vals['total']}")
+
+
+            # A_list = []
+            # B_list = []
+
+            # for name, param in model.named_parameters():
+            #     if "lora_a" in name.lower():
+            #         A_list.append(param.detach().flatten())
+            #     elif "lora_b" in name.lower():
+            #         B_list.append(param.detach().flatten())
+
+            # if A_list:
+            #     A_tensor = torch.cat(A_list)
+            #     print(f"Total LoRA A norm: {A_tensor.norm(p=2)}")
+
+            # if B_list:
+            #     B_tensor = torch.cat(B_list)
+            #     print(f"Total LoRA B norm: {B_tensor.norm(p=2)}")
+
+
         # added by me, for VeRA
         elif adapter == 'vera':
             from peft import VeraConfig

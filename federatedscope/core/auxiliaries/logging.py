@@ -241,9 +241,9 @@ def logline_2_wandb_dict(exp_stop_normal, line, log_res_best, raw_out):
         res = json.loads(res)
         # pre-process the roles
         cur_round = res['Round']
-        if "Server" in res['Role']:
-            if cur_round != "Final" and 'Results_raw' in res:
-                res.pop('Results_raw')
+        # if "Server" in res['Role']:
+        #     if cur_round != "Final" and 'Results_raw' in res:
+        #         res.pop('Results_raw')
         role = res.pop('Role')
         # parse the k-v pairs
         for key, val in res.items():

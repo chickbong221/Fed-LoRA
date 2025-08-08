@@ -9,15 +9,14 @@ federate:
   client_num: 3
   total_round_num: 1000
   save_to: "fedsa-lora_mnli-m.ckpt"
-  share_local_model: True
+  share_local_model: False
   online_aggr: False
   method: 'exact_lora'
-  make_global_eval: False
 personalization: 
   local_param: []
 data:
   root: data/
-  type: 'rte@glue'
+  type: 'mnli@glue'
   matched: True
   splitter: 'lda'
   splitter_args: [{'alpha': 0.5}]

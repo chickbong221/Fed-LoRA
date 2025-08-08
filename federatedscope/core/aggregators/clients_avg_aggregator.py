@@ -61,6 +61,43 @@ class ClientsAvgAggregator(Aggregator):
         """
         Calculates the weighted average of models.
         """
+
+        def extract_lora_AB(models):
+            A_all = []
+            B_all = []
+
+            for i in range(0, len(models)):
+                _, state_dict = models[i]
+
+                A_list = []
+                B_list = []
+
+                for name, param in state_dict.items():
+                    if "lora_A" in name:
+                        # print(f"Extracting {name} with shape {param}")
+                        A_list.append(param.detach().clone())
+                    elif "lora_B" in name:
+                        B_list.append(param.detach().clone())
+
+                A_list = sorted(A_list, key=lambda x: x.shape)
+                B_list = sorted(B_list, key=lambda x: x.shape)
+
+                A_all.append(torch.stack(A_list))  # shape: [num_layers, ...]
+                B_all.append(torch.stack(B_list))
+
+            A_all = torch.stack(A_all)  # shape: [num_clients, num_layers, ...]
+            B_all = torch.stack(B_all)
+
+            return A_all, B_all
+
+        # A_all, B_all = extract_lora_AB(models)
+
+        # A_all_copy = A_all.clone()
+        # B_all_copy = B_all.clone()
+
+        # value = B_all_copy[0].norm(p=2).item()
+        # print(f"{value:.10f}")
+
         training_set_size = 0
         for i in range(len(models)):
             sample_size, _ = models[i]

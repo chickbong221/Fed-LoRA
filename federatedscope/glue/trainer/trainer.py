@@ -112,6 +112,62 @@ class GLUETrainer(GeneralTorchTrainer):
         if ctx.skip_this_batch:
             return
 
+        def get_lora_matrices_norm(model):
+            state_dict = model.state_dict()
+
+            A_list = []
+            B_list = []
+            for name, param in state_dict.items():
+                if "lora_A" in name:
+                    # print(f"Extracting {name} with shape {param}")
+                    A_list.append(param.detach().clone())
+                elif "lora_B" in name:
+                    B_list.append(param.detach().clone())
+
+            A_list = sorted(A_list, key=lambda x: x.shape)
+            B_list = sorted(B_list, key=lambda x: x.shape)
+
+            norm_A, norm_B = None, None
+
+            if A_list:
+                A_all = torch.cat(A_list)
+                norm_A = A_all.norm(2).item()
+
+            if B_list:
+                B_all = torch.cat(B_list)
+                norm_B = B_all.norm(2).item()
+
+            return norm_A, norm_B
+        
+        def get_lora_AB_grad_norm(model, norm_type=2):
+            grad_list_A = []
+            grad_list_B = []
+
+            for name, param in model.named_parameters():
+                if param.grad is None:
+                    continue
+
+                if "lora_A" in name:
+                    grad = param.grad.detach()
+                    grad_list_A.append(grad)
+
+                elif "lora_B" in name:
+                    grad = param.grad.detach()
+                    grad_list_B.append(grad)
+
+            norm_A, norm_B = None, None
+
+            if grad_list_A:
+                all_grads_A = torch.cat(grad_list_A)
+                norm_A = all_grads_A.norm(norm_type).item()
+
+            if grad_list_B:
+                all_grads_B = torch.cat(grad_list_B)
+                norm_B = all_grads_B.norm(norm_type).item()
+
+            return norm_A, norm_B
+
+
         if ctx.cfg.llm.deepspeed.use:
             ctx.model_engine.backward(ctx.loss_task)
             ctx.model_engine.step()
@@ -123,7 +179,77 @@ class GLUETrainer(GeneralTorchTrainer):
                 torch.nn.utils.clip_grad_norm_(ctx.model.parameters(),
                                                ctx.grad_clip)
 
+            # opt_params = {id(p): i for i, g in enumerate(ctx.optimizer.param_groups) for p in g["params"]}
+            # for n,p in ctx.model.named_parameters():
+            #     if "lora_A" in n:
+            #         print(n, "requires_grad", p.requires_grad, 
+            #             "in_opt", id(p) in opt_params, 
+            #             "opt_group", opt_params.get(id(p), None))
+            #         if id(p) in opt_params:
+            #             gi = opt_params[id(p)]
+            #             print("  -> lr:", ctx.optimizer.param_groups[gi].get("lr"),
+            #                 "weight_decay:", ctx.optimizer.param_groups[gi].get("weight_decay", 0))
+
+            # for n,p in ctx.model.named_parameters():
+            #     if "lora_A" in n:
+            #         if p.grad is not None:
+            #             cos_sim = torch.nn.functional.cosine_similarity(
+            #                 p.grad.view(1, -1), p.data.view(1, -1)
+            #             )
+            #             print(n, "grad_norm:", p.grad.norm().item(),
+            #                     "param_norm:", p.data.norm().item(),
+            #                     "cos_sim(grad,param):", cos_sim.item())
+            #             # print(n, "param_norm:", p.data.norm().item())
+            #             break
+
+            # for n,p in ctx.model.named_parameters():
+            #     if "lora_B" in n:
+            #         if p.grad is not None:
+            #             cos_sim = torch.nn.functional.cosine_similarity(
+            #                 p.grad.view(1, -1), p.data.view(1, -1)
+            #             )
+            #             # print(n, "grad_norm:", p.grad.norm().item(),
+            #             #         "param_norm:", p.data.norm().item(),
+            #             #         "cos_sim(grad,param):", cos_sim.item())
+            #             print(n, "param_norm:", p.data.norm().item())
+            #             break
+
+
+            # added by me, for LoRA
+            # norm_grad_A, norm_grad_B = get_lora_AB_grad_norm(ctx.model)
+            # norm_A, norm_B = get_lora_matrices_norm(ctx.model)
+            # print(f"LoRA A norm: {norm_grad_A}")
+            # print(f"LoRA A grad norm: {norm_A}")
+
+            p_before_dict = {}
+
+            # Lưu giá trị param trước khi update
+            for n, p in ctx.model.named_parameters():
+                if "lora_A" in n and p.requires_grad:
+                    p_before_dict[n] = p.detach().clone()
+
             ctx.optimizer.step()
+
+            count = 0
+
+            for n, p in ctx.model.named_parameters():
+                if "lora_A" in n and p.requires_grad:
+                    p_after = p.detach().clone()
+
+                    # Compare changes after-before optimization step
+                    # diff_norm = (p_after - p_before_dict[n]).norm().item()
+                    # if diff_norm == 0:
+                    #     count += 1
+                    # count += 1
+                    # print(f"{n} | Before norm: {p_before_dict[n].norm().item()} "
+                    #     f"| After norm: {p_after.norm().item()} "
+                    #     f"| Δ norm: {diff_norm}")
+
+            # print(f"Number of LoRA A parameters with no change: {count}")
+
+            # norm_A, norm_B = get_lora_matrices_norm(ctx.model)
+            # print(f"LoRA A norm after step: {norm_A}")
+            # print(f"LoRA B norm after step: {norm_B}")
         if ctx.scheduler is not None:
             ctx.scheduler.step()
 
