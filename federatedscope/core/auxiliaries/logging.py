@@ -202,7 +202,7 @@ def logfile_2_wandb_dict(exp_log_f, raw_out=True):
 def logline_2_wandb_dict(exp_stop_normal, line, log_res_best, raw_out):
     log_res = {}
     if "INFO:" in line and "Find new best result for" in line:
-        print("Type 1")
+        # print("Type 1")
         # Logger type 1, each line for each metric, e.g.,
         # 2022-03-22 10:48:42,562 (server:459) INFO: Find new best result
         # for client_best_individual.test_acc with value 0.5911787974683544
@@ -215,7 +215,7 @@ def logline_2_wandb_dict(exp_stop_normal, line, log_res_best, raw_out):
         log_res_best[best_key.strip()] = float(best_val.strip())
 
     if "Find new best result:" in line:
-        print("Type 2")
+        # print("Type 2")
         # each line for all metric of a role, e.g.,
         # Find new best result: {'Client #1': {'val_loss':
         # 132.9812364578247, 'test_total': 36, 'test_avg_loss':
@@ -231,7 +231,7 @@ def logline_2_wandb_dict(exp_stop_normal, line, log_res_best, raw_out):
                 log_res_best[f"best_{best_type_key}/{inner_key}"] = inner_val
 
     if "'Role'" in line:
-        print("Type 3")
+        # print("Type 3")
         if raw_out:
             line = line.split("INFO: ")[1]
         res = line.replace("\'", "\"")

@@ -9,7 +9,7 @@ federate:
   client_num: 3
   total_round_num: 1000
   save_to: "fedsa-lora_mnli-m.ckpt"
-  share_local_model: True
+  share_local_model: False
   online_aggr: False
 personalization: 
   local_param: ['lora_B', 'classifier']
