@@ -51,6 +51,7 @@ class BaseRunner(object):
                  client_class=Client,
                  config=None,
                  client_configs=None):
+        self.count = 0
         self.data = data
         self.server_class = server_class
         self.client_class = client_class
@@ -421,10 +422,14 @@ class StandaloneRunner(BaseRunner):
             if each_receiver == 0:
                 self.server.msg_handlers[msg.msg_type](msg)
                 self.server._monitor.track_download_bytes(download_bytes)
+                # print(f"server msg {msg.msg_type} download: {download_bytes}")
+                # print(f"total server download: {self.server._monitor.total_download_bytes}")
             else:
                 self.client[each_receiver].msg_handlers[msg.msg_type](msg)
                 self.client[each_receiver]._monitor.track_download_bytes(
                     download_bytes)
+                # print(f"client {each_receiver} msg {msg.msg_type} download: {download_bytes}")
+                # print(f"total client {each_receiver} download: {self.client[each_receiver]._monitor.total_download_bytes}")
 
     def _run_simulation_online(self):
         """
@@ -471,6 +476,7 @@ class StandaloneRunner(BaseRunner):
         while True:
             if len(self.shared_comm_queue) > 0:
                 msg = self.shared_comm_queue.popleft()
+                # print(f"shared_com msg: {msg._sender}")
                 if not self.cfg.vertical.use and msg.receiver == [
                         self.server_id
                 ]:

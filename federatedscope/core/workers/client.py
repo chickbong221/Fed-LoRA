@@ -432,6 +432,10 @@ class Client(BaseClient):
                         shared_model_para = symmetric_uniform_quantization(
                             shared_model_para, nbits)
 
+                # from pympler import asizeof
+                # model_sizehi = asizeof.asizeof(shared_model_para)
+                # print(f"client {self.ID} model size: {model_sizehi}")
+
                 self.comm_manager.send(
                     Message(msg_type='model_para',
                             sender=self.ID,

@@ -485,6 +485,7 @@ class Server(BaseServer):
             # Due to lazy load, we merge two state dict
             merged_param = merge_param_dict(model.state_dict().copy(), result)
             model.load_state_dict(merged_param, strict=False)
+            aggregator.update(result)
 
         return aggregated_num
 
@@ -726,6 +727,10 @@ class Server(BaseServer):
                 ]
             else:
                 model_para = symmetric_uniform_quantization(model_para, nbits)
+
+        # from pympler import asizeof
+        # model_sizehi = asizeof.asizeof(model_para)
+        # print(f"server {self.ID} model size: {model_sizehi}")
 
         # We define the evaluation happens at the end of an epoch
         rnd = self.state - 1 if msg_type == 'evaluate' else self.state

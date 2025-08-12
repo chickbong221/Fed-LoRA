@@ -35,53 +35,7 @@ class ExactClientsAggregator(Aggregator):
         recover_fun = agg_info['recover_fun'] if (
             'recover_fun' in agg_info and self.cfg.federate.use_ss) else None
 
-        # TODO 2. Split grad_A and grad_B
-        # print(f"model keys: {models[0][1].keys()}")
-        """
-        lora_A_list = []
-        lora_B_list = []
-        for name, param in model.named_parameters():
-            if "lora_A" in name:
-                lora_A_list.append(SOMETHING)
-            if "lora_B" in name:
-                lora_B_list.append(SOMETHING)    
-            flat the LIST
-            
-        Tensor -> List in Line 196 - 202 of the following link:
-        Gradient -> Tensor in Line 232 - 233 of the following link:
-        https://github.com/chickbong221/FCL/blob/PFLlib-based/system/flcore/servers/serverstgm.py
-        """
-
-        # TODO 2'. self._para_weighted_avg grad_A and grad_B, and assign back to avg_model_2
-        # FIXME The results of avg_model_2 must be equal to avg_model
-        # TODO 3. NOTYET: Find Grad_A and Grad_B according to equation in paper
-
-        """
-        meta_weights = self.stgm_high(
-                        meta_weights=self.global_model,
-                        inner_weights=self.uploaded_models,
-                        lr_meta= self.stgm_meta_lr
-                    )
-        self.global_model.load_state_dict(copy.deepcopy(meta_weights))
-        
-        - And we will change the function in Line 265 and Line 322-327
-        """
-        # avg_model = self._para_weighted_avg(models, recover_fun=recover_fun)
-        # avg_model_2 = self._lora_weighted_avg(models, recover_fun=recover_fun)
-
-        # # Test if avg_model and avg_model_2 are approximately equal
-        # for key in avg_model:
-        #     if key in avg_model_2:
-        #         tensor1 = avg_model[key].detach()
-        #         tensor2 = avg_model_2[key].detach()
-        #         if not torch.allclose(tensor1, tensor2, rtol=1e-3, atol=1e-3):
-        #             raise ValueError(
-        #                 f"Mismatch in aggregated parameters for {key}:\n"
-        #                 f"Max diff: {(tensor1 - tensor2).abs().max()}\n"
-        #                 f"{tensor1} vs {tensor2}"
-        #             )
-
-        avg_model = self._para_weighted_avg(models, recover_fun=recover_fun)
+        avg_model = self._grad_weighted_avg(models, recover_fun=recover_fun)
 
         return avg_model
 
@@ -90,6 +44,7 @@ class ExactClientsAggregator(Aggregator):
         Arguments:
             model_parameters (dict): PyTorch Module object's state_dict.
         """
+        # print("chicken")
         self.model.load_state_dict(model_parameters, strict=False)
 
     def save_model(self, path, cur_round=-1):
@@ -108,6 +63,77 @@ class ExactClientsAggregator(Aggregator):
         else:
             raise ValueError("The file {} does NOT exist".format(path))
 
+    def _grad_weighted_avg(self, models, recover_fun=None):
+        """
+        Apply Exact LoRA scaling using U, V for each client's gradients,
+        then calculate the weighted average and update the global model.
+        """
+        # Extract current parameters and gradients
+        A_all, B_all = self.extract_lora_AB(models)
+        grad_A_all, grad_B_all = self.extract_lora_AB_gradients(models)
+        
+        # Optimize U, V based on gradients to achieve ideal parameter update
+        U, V = self.optimize_uv_on_gradients(models, lr=5e-3, steps=100)
+
+        num_clients = len(models)
+        training_set_size = sum(sample_size for sample_size, _ in models)
+
+        # Start with global model as base
+        avg_model = {}
+        global_state_dict = self.model.state_dict()
+        
+        # Initialize avg_model with global model parameters
+        for key in global_state_dict:
+            avg_model[key] = global_state_dict[key].clone()
+
+        # Compute weighted average of scaled gradients
+        total_weighted_gradients = {}
+        
+        for key in global_state_dict:
+            total_weighted_gradients[key] = torch.zeros_like(global_state_dict[key])
+            
+            for i in range(num_clients):
+                local_sample_size, local_model = models[i]
+
+                if self.cfg.federate.ignore_weight:
+                    weight = 1.0 / num_clients
+                elif self.cfg.federate.use_ss:
+                    weight = 1.0
+                else:
+                    weight = local_sample_size / training_set_size
+
+                # Compute gradient for this client and parameter
+                if key in local_model:
+                    if not self.cfg.federate.use_ss:
+                        local_param = param2tensor(local_model[key])
+                    else:
+                        local_param = local_model[key]
+                    
+                    # Compute gradient (client_param - global_param)
+                    gradient = local_param - global_state_dict[key]
+
+                    # Scale gradient with U[i] or V[i] if key contains lora_A or lora_B
+                    scaled_gradient = gradient
+                    if "lora_A" in key:
+                        scaled_gradient = U[i] * gradient
+                    elif "lora_B" in key:
+                        scaled_gradient = V[i] * gradient
+
+                    # Accumulate weighted scaled gradients
+                    total_weighted_gradients[key] += scaled_gradient * weight
+
+            # Secret sharing post-processing for gradients
+            if self.cfg.federate.use_ss and recover_fun:
+                total_weighted_gradients[key] = recover_fun(total_weighted_gradients[key])
+                total_weighted_gradients[key] /= training_set_size
+                total_weighted_gradients[key] = torch.FloatTensor(total_weighted_gradients[key])
+
+        # Apply accumulated gradients to global model
+        for key in avg_model:
+            avg_model[key] = global_state_dict[key] + total_weighted_gradients[key]
+
+        return avg_model
+
     def _para_weighted_avg(self, models, recover_fun=None):
         """
         Apply Exact LoRA scaling using U, V for each client,
@@ -115,19 +141,14 @@ class ExactClientsAggregator(Aggregator):
         """
         A_all, B_all = self.extract_lora_AB(models)
 
-        A_all_copy = A_all.clone()
-        B_all_copy = B_all.clone()
+        # A_all_copy = A_all.clone()
+        # B_all_copy = B_all.clone()
 
-        value = A_all_copy[0].norm(p=2).item()
-        print(f"{value:.10f}")
-
-
+        # value = A_all_copy[0].norm(p=2).item()
+        # print(f"{value:.10f}")
         # print(f"Shape of A_all: {A_all.shape}")
-
         # print(A_all_copy.norm(p=2))
-
-        diffs = self.compute_pairwise_mse(A_all_copy, B_all_copy)
-
+        # diffs = self.compute_pairwise_mse(A_all_copy, B_all_copy)
         # for (i, j), vals in diffs.items():
         #     print(f"Client pair ({i}, {j}): MSE_A = {vals['mse_A']}, MSE_B = {vals['mse_B']}, Total = {vals['total']}")
         
@@ -152,6 +173,7 @@ class ExactClientsAggregator(Aggregator):
                 if not self.cfg.federate.use_ss:
                     local_model[key] = param2tensor(local_model[key])
 
+                # TODO: Check if U and V scale the weights down
                 # Scale with U[i] or V[i] if key contains lora_A or lora_B
                 scaled_tensor = local_model[key]
                 # print(U[i].device, V[i].device, scaled_tensor.device)
@@ -173,111 +195,186 @@ class ExactClientsAggregator(Aggregator):
 
         return avg_model
 
-    def optimize_uv(self, A_all, B_all, lr=5e-3, steps=50):
-
+    def optimize_uv_on_gradients(self, models, lr=5e-3, steps=50):
+ 
+        # Extract current parameters and gradients
+        A_all, B_all = self.extract_lora_AB(models)
+        grad_A_all, grad_B_all = self.extract_lora_AB_gradients(models)
+        
+        # Move to device
         A_all = A_all.to(self.device)
         B_all = B_all.to(self.device)
-
+        grad_A_all = grad_A_all.to(self.device)
+        grad_B_all = grad_B_all.to(self.device)
+        
         num_clients = A_all.shape[0]
+        
+        # Get global model's current LoRA parameters
+        global_state_dict = self.model.state_dict()
+        global_A_dict = {}
+        global_B_dict = {}
+        
+        for name, param in global_state_dict.items():
+            if "lora_A" in name:
+                global_A_dict[name] = param.detach().clone()
+            elif "lora_B" in name:
+                global_B_dict[name] = param.detach().clone()
+        
+        # Convert to same format as A_all, B_all (sorted order)
+        sorted_A_names = sorted(global_A_dict.keys())
+        sorted_B_names = sorted(global_B_dict.keys())
+        
+        global_A_list = [global_A_dict[name] for name in sorted_A_names]
+        global_B_list = [global_B_dict[name] for name in sorted_B_names]
+        
+        global_A = torch.stack(global_A_list).to(self.device)  # [num_layers, ...]
+        global_B = torch.stack(global_B_list).to(self.device)  # [num_layers, ...]
+        
+        # Compute ideal update from the original optimize_uv objective
         BA = []
-
         for i in range(len(A_all)):
             BA.append(torch.matmul(B_all[i], A_all[i]))
-        ideal_update = torch.stack(BA).mean(dim=0)
-        # print(ideal_update)
-
+        ideal_update = torch.stack(BA).mean(dim=0)  # [num_layers, ...]
+        
+        # Initialize optimization parameters
         U = torch.nn.Parameter(torch.ones(num_clients, device=self.device))
         V = torch.nn.Parameter(torch.ones(num_clients, device=self.device))
-
-        optimizer = torch.optim.SGD([U, V], lr=lr)
-
-        # for step in range(steps):
-        #     optimizer.zero_grad()
-
-        #     UA = (U.view(-1, 1, 1, 1) * A_all).mean(dim=0)  # [num_layers, ...]
-        #     VB = (V.view(-1, 1, 1, 1) * B_all).mean(dim=0)
-        #     naive_update = torch.matmul(VB, UA)  # [num_layers, ...]
-
-        #     # print(naive_update)
-        #     # loss_fn = torch.nn.L1Loss()
-        #     # loss = loss_fn(naive_update, ideal_update)
-        #     loss = torch.mean((naive_update - ideal_update) ** 2) 
+        
+        optimizer = torch.optim.AdamW([U, V], lr=lr)
+        
+        for step in range(steps):
+            optimizer.zero_grad()
             
-        #     loss.backward()
-        #     optimizer.step()
-
-        #     if step % 10 == 0:
-        #         print(f"Step {step}: Loss = {loss.item()}")
-
-        # UA = (U.view(-1, 1, 1, 1) * A_all).mean(dim=0)  # [num_layers, ...]
-        # VB = (V.view(-1, 1, 1, 1) * B_all).mean(dim=0)
-        # naive_update = torch.matmul(VB, UA)  # [num_layers, ...]
-
-        # # loss_fn = torch.nn.MSELoss()
-        # # loss_fn = torch.nn.L1Loss()
-        # # loss = loss_fn(naive_update, ideal_update)
-        # loss = torch.mean((naive_update - ideal_update) ** 2)
-
-        # print(f"Loss = {loss.item()}")
-
+            # Apply weighted gradients to global parameters
+            weighted_grad_A = (U.view(-1, 1, 1, 1) * grad_A_all).mean(dim=0)  # [num_layers, ...]
+            weighted_grad_B = (V.view(-1, 1, 1, 1) * grad_B_all).mean(dim=0)  # [num_layers, ...]
+            
+            # Updated parameters after applying weighted gradients
+            updated_A = global_A + weighted_grad_A  # [num_layers, ...]
+            updated_B = global_B + weighted_grad_B  # [num_layers, ...]
+            
+            # Compute the update that would be achieved with these new parameters
+            achieved_update = torch.matmul(updated_B, updated_A)  # [num_layers, ...]
+            
+            # Loss: difference between achieved update and ideal update
+            loss = torch.mean((achieved_update*3e6 - ideal_update*3e6) ** 2)
+            
+            loss.backward()
+            optimizer.step()
+            
+            if step % 10 == 0:
+                print(f"Step {step}: Loss = {loss.item()}")
+        
         return U.detach().squeeze().cpu(), V.detach().squeeze().cpu()  # shape: [num_clients]
 
 
+    def extract_lora_AB_gradients(self, models):
+        """
+        Extract gradients of LoRA A and B matrices by computing the difference
+        between client models and the global model.
+        
+        Args:
+            models: List of (model_id, state_dict) tuples from clients
+            
+        Returns:
+            tuple: (grad_A_all, grad_B_all) where each is a tensor of shape 
+                [num_clients, num_layers, ...]
+        """
+        # Get global model state dict
+        global_state_dict = self.model.state_dict()
+        
+        # Extract global LoRA parameters in sorted order
+        global_A_dict = {}
+        global_B_dict = {}
+        
+        for name, param in global_state_dict.items():
+            if "lora_A" in name:
+                global_A_dict[name] = param.detach().clone()
+            elif "lora_B" in name:
+                global_B_dict[name] = param.detach().clone()
+        
+        # Sort the names to ensure consistent ordering
+        sorted_A_names = sorted(global_A_dict.keys())
+        sorted_B_names = sorted(global_B_dict.keys())
+        
+        grad_A_all = []
+        grad_B_all = []
+        
+        for i in range(len(models)):
+            _, client_state_dict = models[i]
+            
+            # Extract client LoRA parameters in the same sorted order
+            client_A_dict = {}
+            client_B_dict = {}
+            
+            for name, param in client_state_dict.items():
+                if "lora_A" in name:
+                    client_A_dict[name] = param.detach().clone()
+                elif "lora_B" in name:
+                    client_B_dict[name] = param.detach().clone()
+            
+            # Compute gradients (client - global) in sorted order
+            grad_A_list = []
+            grad_B_list = []
+            
+            for name in sorted_A_names:
+                if name in client_A_dict:
+                    grad = client_A_dict[name] - global_A_dict[name]
+                    grad_A_list.append(grad)
+                else:
+                    # Handle case where client might not have this parameter
+                    print(f"Warning: {name} not found in client {i}")
+                    grad_A_list.append(torch.zeros_like(global_A_dict[name]))
+            
+            for name in sorted_B_names:
+                if name in client_B_dict:
+                    grad = client_B_dict[name] - global_B_dict[name]
+                    grad_B_list.append(grad)
+                else:
+                    # Handle case where client might not have this parameter
+                    print(f"Warning: {name} not found in client {i}")
+                    grad_B_list.append(torch.zeros_like(global_B_dict[name]))
+            
+            grad_A_all.append(torch.stack(grad_A_list))  # shape: [num_layers, ...]
+            grad_B_all.append(torch.stack(grad_B_list))
+        
+        grad_A_all = torch.stack(grad_A_all)  # shape: [num_clients, num_layers, ...]
+        grad_B_all = torch.stack(grad_B_all)
+        
+        return grad_A_all, grad_B_all
+
     def extract_lora_AB(self, models):
+
         A_all = []
         B_all = []
 
-        for i in range(0, len(models)):
+        for i in range(len(models)):
             _, state_dict = models[i]
 
-            A_list = []
-            B_list = []
+            # Use dictionaries to store parameters with their names
+            A_dict = {}
+            B_dict = {}
 
             for name, param in state_dict.items():
                 if "lora_A" in name:
-                    # print(f"Extracting {name} with shape {param}")
-                    A_list.append(param.detach().clone())
+                    A_dict[name] = param.detach().clone()
                 elif "lora_B" in name:
-                    B_list.append(param.detach().clone())
+                    B_dict[name] = param.detach().clone()
 
-            A_list = sorted(A_list, key=lambda x: x.shape)
-            B_list = sorted(B_list, key=lambda x: x.shape)
+            # Sort the names to ensure consistent ordering
+            sorted_A_names = sorted(A_dict.keys())
+            sorted_B_names = sorted(B_dict.keys())
+            
+            # Create lists in sorted order
+            A_list = [A_dict[name] for name in sorted_A_names]
+            B_list = [B_dict[name] for name in sorted_B_names]
 
             A_all.append(torch.stack(A_list))  # shape: [num_layers, ...]
             B_all.append(torch.stack(B_list))
 
         A_all = torch.stack(A_all)  # shape: [num_clients, num_layers, ...]
         B_all = torch.stack(B_all)
-
-        # norm_A = A_all.norm(p=2)  # scalar
-        # norm_B = B_all.norm(p=2)
-
-        # print(f"Norm of A_all: {norm_A.item()}, Norm of B_all: {norm_B.item()}")
-        # print(f"Shape of A_all: {A_all.shape}, Shape of B_all: {B_all.shape}")
-        # print(f"Max-Min of A_all: {A_all.min()}, {A_all.max()}")
-        # print(f"Max-Min of B_all: {B_all.min()}, {B_all.max()}")
-
-        def normalize_minmax(tensor):
-            min_val = tensor.min()
-            max_val = tensor.max()
-            return (tensor - min_val) / (max_val - min_val + 1e-8)
-
-        def normalize_l2(tensor):
-            norm = tensor.norm(p=2)
-            return tensor / (norm + 1e-8)
-
-        # A_all = normalize_minmax(A_all)
-        # B_all = normalize_minmax(B_all)
-
-        # A_all = normalize_l2(A_all)
-        # B_all = normalize_l2(B_all)
-
-        # norm_A = A_all.norm(p=2)  # scalar
-        # norm_B = B_all.norm(p=2)
-
-        # print(f"Norm of A_all after nor: {norm_A.item()}, Norm of B_all after nor: {norm_B.item()}")
-        # print(f"Shape of A_all after nor: {A_all.shape}, Shape of B_all after nor: {B_all.shape}")
-
+        
         return A_all, B_all
 
     def compute_pairwise_mse(self, A_all, B_all):
@@ -299,7 +396,7 @@ class ExactClientsAggregator(Aggregator):
 
         return pairwise_mse
 
-
+        
 class OnlineExactClientsAggregator(ExactClientsAggregator):
     """
     Implementation of online aggregation of FedAvg.

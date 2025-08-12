@@ -218,8 +218,8 @@ class GLUETrainer(GeneralTorchTrainer):
             # added by me, for LoRA
             # norm_grad_A, norm_grad_B = get_lora_AB_grad_norm(ctx.model)
             # norm_A, norm_B = get_lora_matrices_norm(ctx.model)
-            # print(f"LoRA A norm: {norm_grad_A}")
-            # print(f"LoRA A grad norm: {norm_A}")
+            # print(f"LoRA grad A norm: {norm_grad_A}")
+            # print(f"LoRA A norm: {norm_A}")
 
             p_before_dict = {}
 
@@ -237,10 +237,10 @@ class GLUETrainer(GeneralTorchTrainer):
                     p_after = p.detach().clone()
 
                     # Compare changes after-before optimization step
-                    # diff_norm = (p_after - p_before_dict[n]).norm().item()
-                    # if diff_norm == 0:
-                    #     count += 1
-                    # count += 1
+                    diff_norm = (p_after - p_before_dict[n]).norm().item()
+                    if diff_norm == 0:
+                        count += 1
+                    ## count += 1
                     # print(f"{n} | Before norm: {p_before_dict[n].norm().item()} "
                     #     f"| After norm: {p_after.norm().item()} "
                     #     f"| Δ norm: {diff_norm}")
