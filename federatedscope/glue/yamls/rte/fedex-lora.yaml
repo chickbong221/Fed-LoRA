@@ -35,7 +35,7 @@ train:
   local_update_steps: 10
   batch_or_epoch: batch
   optimizer:
-    lr: 2e-2
+    lr: 5e-3
   is_enable_half: True
 criterion:
   type: CrossEntropyLoss

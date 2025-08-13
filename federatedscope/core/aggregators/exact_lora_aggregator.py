@@ -257,8 +257,11 @@ class ExactClientsAggregator(Aggregator):
             achieved_update = torch.matmul(updated_B, updated_A)  # [num_layers, ...]
             
             # Loss: difference between achieved update and ideal update
-            eps = 5e-4
-            loss = torch.mean(((achieved_update*1e2 - ideal_update*1e2) / (ideal_update + eps)) ** 2)
+            ideal_update = ideal_update.float() 
+            achieved_update = achieved_update.float()
+            diff = (achieved_update - ideal_update) / (torch.min(achieved_update - ideal_update)+ 1e-8)
+
+            loss = torch.mean(diff ** 2)
 
             loss.backward()
             optimizer.step()

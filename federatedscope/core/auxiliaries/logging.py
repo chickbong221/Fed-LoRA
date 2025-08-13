@@ -150,7 +150,7 @@ def init_wandb(cfg):
     except ImportError:
         logger.error("cfg.wandb.use=True but not install the wandb package")
         exit()
-    dataset_name = cfg.data.type
+    dataset_name = cfg.data.type.split('@')[0]
     method_name = cfg.federate.method
     exp_name = cfg.expname
 
@@ -168,7 +168,7 @@ def init_wandb(cfg):
                config=cfg_yaml,
                group=dataset_name,
                job_type=method_name,
-               name=exp_name,
+               name=f"{dataset_name}@{exp_name}",
                notes=f"{method_name}, {exp_name}")
 
 
