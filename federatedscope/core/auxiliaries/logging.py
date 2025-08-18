@@ -150,7 +150,10 @@ def init_wandb(cfg):
     except ImportError:
         logger.error("cfg.wandb.use=True but not install the wandb package")
         exit()
-    dataset_name = cfg.data.type.split('@')[0]
+    if not cfg.data.matched:
+        dataset_name = "mmnli"
+    else:
+        dataset_name = cfg.data.type.split('@')[0]
     method_name = cfg.federate.method
     exp_name = cfg.expname
 
