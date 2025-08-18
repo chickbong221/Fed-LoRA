@@ -4,27 +4,25 @@ device: 0
 early_stop:
   patience: 0
 federate:
-  freeze_A: True
+  freeze_A: False
   mode: standalone
   client_num: 3
-  total_round_num: 1000
+  total_round_num: 600
   save_to: "fedsa-lora_mnli-m.ckpt"
-  share_local_model: True
   online_aggr: False
 personalization: 
   local_param: []
 data:
   root: data/
-  type: 'qnli@glue'
-  matched: True
+  type: 'mnli@glue'
+  matched: False
   splitter: 'lda'
   splitter_args: [{'alpha': 0.5}]
 llm:
   tok_len: 128
   adapter:
     use: True
-    args: [ { 'adapter_package': 'peft', 'adapter_method': 'rslora', 'r': 8, 'lora_alpha': 16, 'lora_dropout': 0.05, 'use_rslora': True } ]
-    # args: [ { 'adapter_package': 'peft', 'adapter_method': 'lora', 'r': 8, 'lora_alpha': 16, 'lora_dropout': 0.05 } ]
+    args: [ { 'adapter_package': 'peft', 'adapter_method': 'lora', 'r': 8, 'lora_alpha': 12, 'lora_dropout': 0.05 } ]
     # args: [ { 'adapter_package': 'peft', 'adapter_method': 'vera', 'r': 8} ]
 
 dataloader:
@@ -32,10 +30,10 @@ dataloader:
 model:
   type: 'FacebookAI/roberta-large@huggingface_llm'
 train:
-  local_update_steps: 10
+  local_update_steps: 5
   batch_or_epoch: batch
   optimizer:
-    lr: 2e-2
+    lr: 8e-3
   is_enable_half: True
 criterion:
   type: CrossEntropyLoss

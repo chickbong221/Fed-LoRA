@@ -4,18 +4,18 @@ device: 0
 early_stop:
   patience: 0
 federate:
-  freeze_A: False
+  freeze_A: True
   mode: standalone
   client_num: 3
   total_round_num: 600
   save_to: "fedsa-lora_mnli-m.ckpt"
   online_aggr: False
 personalization: 
-  local_param: ['lora_B', 'classifier']
+  local_param: []
 data:
   root: data/
   type: 'mnli@glue'
-  matched: True
+  matched: False
   splitter: 'lda'
   splitter_args: [{'alpha': 0.5}]
 llm:

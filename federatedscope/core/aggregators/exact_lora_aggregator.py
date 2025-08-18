@@ -152,7 +152,7 @@ class ExactClientsAggregator(Aggregator):
         # for (i, j), vals in diffs.items():
         #     print(f"Client pair ({i}, {j}): MSE_A = {vals['mse_A']}, MSE_B = {vals['mse_B']}, Total = {vals['total']}")
         
-        U, V = self.optimize_uv(A_all, B_all, lr=5e-3, steps=100)
+        U, V = self.optimize_uv(A_all, B_all, lr=5e-3, steps=200)
 
         num_clients = len(models)
         training_set_size = sum(sample_size for sample_size, _ in models)
