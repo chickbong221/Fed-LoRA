@@ -524,9 +524,9 @@ class Client(BaseClient):
         """
         sender, timestamp = message.sender, message.timestamp
         self.state = message.state
-        if message.content is not None:
-            self.trainer.update(message.content,
-                                strict=self._cfg.federate.share_local_model)
+        # if message.content is not None:
+        #     self.trainer.update(message.content,
+        #                         strict=self._cfg.federate.share_local_model)
         if self.early_stopper.early_stopped and self._cfg.federate.method in [
                 "local", "global"
         ]:
