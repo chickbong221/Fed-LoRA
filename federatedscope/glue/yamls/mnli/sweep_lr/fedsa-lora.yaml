@@ -6,8 +6,8 @@ early_stop:
 federate:
   freeze_A: False
   mode: standalone
-  client_num: 3
-  total_round_num: 1000
+  client_num: 10
+  total_round_num: 600
   save_to: "fedsa-lora_mnli-m.ckpt"
   share_local_model: True
   online_aggr: False
@@ -23,8 +23,8 @@ llm:
   tok_len: 128
   adapter:
     use: True
-    args: [ { 'adapter_package': 'peft', 'adapter_method': 'lora', 'r': 8, 'lora_alpha': 16, 'lora_dropout': 0.05 } ]
-    # args: [ { 'adapter_package': 'peft', 'adapter_method': 'vera', 'r': 8} ]
+    args: [ { 'adapter_package': 'peft', 'adapter_method': 'lora', 'r': 16, 'lora_alpha': 24, 'lora_dropout': 0.05 } ]
+    # args: [ { 'adapter_package': 'peft', 'adapter_method': 'vera', 'r': 16} ]
 
 dataloader:
   batch_size: 128
