@@ -12,7 +12,7 @@ def extend_evaluation_cfg(cfg):
 
     cfg.eval.freq = 1
     cfg.eval.metrics = []
-    cfg.eval.split = ['test', 'val']
+    cfg.eval.split = ['val']
     cfg.eval.report = ['weighted_avg', 'avg', 'fairness',
                        'raw']  # by default, we report comprehensive results
     cfg.eval.best_res_update_round_wise_key = "val_loss"

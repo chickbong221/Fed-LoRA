@@ -2,6 +2,7 @@ import copy
 import logging
 import sys
 import pickle
+import wandb
 
 from federatedscope.core.message import Message
 from federatedscope.core.communication import StandaloneCommManager, \
@@ -75,6 +76,8 @@ class Client(BaseClient):
         # Un-configured worker
         if config is None:
             return
+
+        self.use_wandb = self._cfg.wandb.use
 
         # the unseen_client indicates that whether this client contributes to
         # FL process by training on its local data and uploading the local
@@ -537,8 +540,33 @@ class Client(BaseClient):
                 self.trainer.finetune()
             for split in self._cfg.eval.split:
                 # TODO: The time cost of evaluation is not considered here
-                eval_metrics = self.trainer.evaluate(
+                eval_metrics, norms_data = self.trainer.evaluate(
                     target_data_split_name=split)
+
+                if self.use_wandb:
+                    client_prefix = 'Client #{}'.format(self.ID)
+
+                    # Prepare logging dictionary
+                    log_dict = {
+                        f"{client_prefix}/lora_norms/A_global_mean": norms_data["A_all_mean_norm"],
+                        f"{client_prefix}/lora_norms/B_global_mean": norms_data["B_all_mean_norm"]
+                    }
+                    
+                    # Add per-layer norms
+                    for layer_name, norm_value in norms_data["A_layer_norms"].items():
+                        # Clean layer name for wandb (replace dots and slashes)
+                        clean_name = layer_name.replace(".", "_").replace("/", "_")
+                        log_dict[f"{client_prefix}/lora_norms/A_layers/{clean_name}"] = norm_value
+                    
+                    for layer_name, norm_value in norms_data["B_layer_norms"].items():
+                        clean_name = layer_name.replace(".", "_").replace("/", "_")
+                        log_dict[f"{client_prefix}/lora_norms/B_layers/{clean_name}"] = norm_value
+                    
+                    # Log to wandb
+                    if self.state is not None:
+                        wandb.log(log_dict, step=self.state)
+                    else:
+                        wandb.log(log_dict)
 
                 if self._cfg.federate.mode == 'distributed':
                     logger.info(

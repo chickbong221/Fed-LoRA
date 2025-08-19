@@ -1,6 +1,7 @@
 import collections
 import copy
 import logging
+import torch
 
 from federatedscope.core.trainers.base_trainer import BaseTrainer
 from federatedscope.core.trainers.enums import MODE, LIFECYCLE

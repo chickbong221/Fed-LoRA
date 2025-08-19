@@ -95,7 +95,47 @@ class GeneralTorchTrainer(Trainer):
         with torch.no_grad():
             super(GeneralTorchTrainer, self).evaluate(target_data_split_name)
 
-        return self.ctx.eval_metrics
+        norms = self.compute_lora_norms(self.ctx.model)
+
+        return self.ctx.eval_metrics, norms
+
+    def compute_lora_norms(self, model):
+        state_dict = model.state_dict()
+
+        A_dict, B_dict = {}, {}
+
+        for name, param in state_dict.items():
+            if "lora_A" in name:
+                A_dict[name] = param.detach().clone()
+            elif "lora_B" in name:
+                B_dict[name] = param.detach().clone()
+
+        sorted_A_names = sorted(A_dict.keys())
+        sorted_B_names = sorted(B_dict.keys())
+
+        A_list = [A_dict[name] for name in sorted_A_names]
+        B_list = [B_dict[name] for name in sorted_B_names]
+
+        # Global norms
+        A_all_norm = sum(torch.norm(w, p=1) for w in A_list) / sum(w.numel() for w in A_list)
+        B_all_norm = sum(torch.norm(w, p=1) for w in B_list) / sum(w.numel() for w in B_list)
+
+        # Per-layer norms
+        A_layer_norms = {
+            name: (torch.norm(A_dict[name], p=1).item() / A_dict[name].numel())
+            for name in sorted_A_names
+        }
+        B_layer_norms = {
+            name: (torch.norm(B_dict[name], p=1).item() / B_dict[name].numel())
+            for name in sorted_B_names
+        }
+
+        return {
+            "A_all_mean_norm": A_all_norm.item(),
+            "B_all_mean_norm": B_all_norm.item(),
+            "A_layer_norms": A_layer_norms,
+            "B_layer_norms": B_layer_norms
+        }
 
     def register_default_hooks_train(self):
         self.register_hook_in_train(
