@@ -30,7 +30,7 @@ if __name__ == '__main__':
     args = parse_args()
     if args.cfg_file:
         init_cfg.merge_from_file(args.cfg_file)
-        init_cfg.expname = os.path.splitext(os.path.basename(args.cfg_file))[0] + "(W_i;D)"
+        init_cfg.expname = os.path.splitext(os.path.basename(args.cfg_file))[0] + "(W_i;D)_10clients"
     cfg_opt, client_cfg_opt = parse_client_cfg(args.opts)
     init_cfg.merge_from_list(cfg_opt)
 
