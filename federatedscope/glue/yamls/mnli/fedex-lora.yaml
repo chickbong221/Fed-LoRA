@@ -23,7 +23,7 @@ llm:
   tok_len: 128
   adapter:
     use: True
-    args: [ { 'adapter_package': 'peft', 'adapter_method': 'lora', 'r': 16, 'lora_alpha': 12, 'lora_dropout': 0.05 } ]
+    args: [ { 'adapter_package': 'peft', 'adapter_method': 'lora', 'r': 16, 'lora_alpha': 16, 'lora_dropout': 0.05 } ]
     # args: [ { 'adapter_package': 'peft', 'adapter_method': 'vera', 'r': 16} ]
 
 dataloader:

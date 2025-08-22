@@ -139,7 +139,7 @@ class GLUETrainer(GeneralTorchTrainer):
 
             return norm_A, norm_B
         
-        def get_lora_AB_grad_norm(model, norm_type=2):
+        def get_lora_AB_grad_norm(model, norm_type=1):
             grad_list_A = []
             grad_list_B = []
 
@@ -178,7 +178,7 @@ class GLUETrainer(GeneralTorchTrainer):
             if ctx.grad_clip > 0:
                 torch.nn.utils.clip_grad_norm_(ctx.model.parameters(),
                                                ctx.grad_clip)
-
+                                               
             # opt_params = {id(p): i for i, g in enumerate(ctx.optimizer.param_groups) for p in g["params"]}
             # for n,p in ctx.model.named_parameters():
             #     if "lora_A" in n:
@@ -216,9 +216,10 @@ class GLUETrainer(GeneralTorchTrainer):
 
 
             # added by me, for LoRA
-            # norm_grad_A, norm_grad_B = get_lora_AB_grad_norm(ctx.model)
+            norm_grad_A, norm_grad_B = get_lora_AB_grad_norm(ctx.model)
             # norm_A, norm_B = get_lora_matrices_norm(ctx.model)
-            # print(f"LoRA grad A norm: {norm_grad_A}")
+            print(f"LoRA grad A norm: {norm_grad_A}")
+            print(f"LoRA grad B norm: {norm_grad_B}")
             # print(f"LoRA A norm: {norm_A}")
 
             p_before_dict = {}
@@ -251,6 +252,7 @@ class GLUETrainer(GeneralTorchTrainer):
             # print(f"LoRA A norm after step: {norm_A}")
             # print(f"LoRA B norm after step: {norm_B}")
         if ctx.scheduler is not None:
+            # print("ahihi")
             ctx.scheduler.step()
 
     def _hook_on_batch_end(self, ctx):

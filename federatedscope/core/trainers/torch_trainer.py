@@ -96,8 +96,9 @@ class GeneralTorchTrainer(Trainer):
             super(GeneralTorchTrainer, self).evaluate(target_data_split_name)
 
         norms = self.compute_lora_norms(self.ctx.model)
+        lr = self.ctx.optimizer.param_groups[0]["lr"]
 
-        return self.ctx.eval_metrics, norms
+        return self.ctx.eval_metrics, norms, lr
 
     def compute_lora_norms(self, model):
         state_dict = model.state_dict()

@@ -540,29 +540,33 @@ class Client(BaseClient):
                 self.trainer.finetune()
             for split in self._cfg.eval.split:
                 # TODO: The time cost of evaluation is not considered here
-                eval_metrics, norms_data = self.trainer.evaluate(
+                eval_metrics, norms_data, lr = self.trainer.evaluate(
                     target_data_split_name=split)
 
                 if self.use_wandb:
-                    client_prefix = 'Client #{}'.format(self.ID)
+                    client_prefix = f"Client #{self.ID}"
 
-                    # Prepare logging dictionary
-                    log_dict = {
-                        f"{client_prefix}/lora_norms/A_global_mean": norms_data["A_all_mean_norm"],
-                        f"{client_prefix}/lora_norms/B_global_mean": norms_data["B_all_mean_norm"]
-                    }
-                    
-                    # Add per-layer norms
+                    # Init log dict
+                    log_dict = {}
+
+                    # Log learning rate
+                    log_dict[f"{client_prefix}/learning_rate"] = lr
+
+                    # Log global norms
+                    log_dict[f"{client_prefix}/lora_norms/A_global_mean"] = norms_data["A_all_mean_norm"]
+                    log_dict[f"{client_prefix}/lora_norms/B_global_mean"] = norms_data["B_all_mean_norm"]
+
+                    # Log per-layer norms (A)
                     for layer_name, norm_value in norms_data["A_layer_norms"].items():
-                        # Clean layer name for wandb (replace dots and slashes)
                         clean_name = layer_name.replace(".", "_").replace("/", "_")
                         log_dict[f"{client_prefix}/lora_norms/A_layers/{clean_name}"] = norm_value
-                    
+
+                    # Log per-layer norms (B)
                     for layer_name, norm_value in norms_data["B_layer_norms"].items():
                         clean_name = layer_name.replace(".", "_").replace("/", "_")
                         log_dict[f"{client_prefix}/lora_norms/B_layers/{clean_name}"] = norm_value
-                    
-                    # Log to wandb
+
+                    # Log to wandb with step if available
                     if self.state is not None:
                         wandb.log(log_dict, step=self.state)
                     else:
