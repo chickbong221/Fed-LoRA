@@ -2,10 +2,13 @@ import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from federatedscope.core.aggregators import Aggregator
-from federatedscope.core.auxiliaries.utils import param2tensor
 import torch.nn.functional as F
 import itertools
+import numpy as np
+from federatedscope.core.aggregators import Aggregator
+from federatedscope.core.auxiliaries.utils import param2tensor
+from torch.optim.lr_scheduler import StepLR
+
 
 # TODO 1. Fix all of the value names of FedAvg -> FedExAgg
 class ExactClientsAggregator(Aggregator):
@@ -73,7 +76,8 @@ class ExactClientsAggregator(Aggregator):
         grad_A_all, grad_B_all = self.extract_lora_AB_gradients(models)
         
         # Optimize U, V based on gradients to achieve ideal parameter update
-        U, V = self.optimize_uv_on_gradients(models, lr=1e-2, steps=150)
+        U, V = self.optimize_exact_uv(models, lr=1e-2, steps=200)
+        a, b = self.optimize_conflict_free_uv(models)
 
         num_clients = len(models)
         training_set_size = sum(sample_size for sample_size, _ in models)
@@ -121,6 +125,7 @@ class ExactClientsAggregator(Aggregator):
 
                     # Accumulate weighted scaled gradients
                     total_weighted_gradients[key] += scaled_gradient * weight
+                    # print(total_weighted_gradients[key].device)
 
             # Secret sharing post-processing for gradients
             if self.cfg.federate.use_ss and recover_fun:
@@ -134,7 +139,7 @@ class ExactClientsAggregator(Aggregator):
 
         return avg_model
 
-    def optimize_uv_on_gradients(self, models, lr=5e-3, steps=50):
+    def optimize_exact_uv(self, models, lr=1e-2, steps=200):
  
         # Extract current parameters and gradients
         A_all, B_all = self.extract_lora_AB(models)
@@ -194,7 +199,7 @@ class ExactClientsAggregator(Aggregator):
             
             # Compute the update that would be achieved with these new parameters
             achieved_update = torch.matmul(updated_B, updated_A)  # [num_layers, ...]
-            
+
             # Loss: difference between achieved update and ideal update
             ideal_update = ideal_update.float() 
             achieved_update = achieved_update.float()
@@ -205,273 +210,112 @@ class ExactClientsAggregator(Aggregator):
             loss.backward()
             optimizer.step()
             
-            if step % 10 == 0:
-                print(f"Step {step}: Loss = {loss.item()}")
+            # if step % 10 == 0:
+            #     print(f"Step {step}: Loss = {loss.item()}")
         
         return U.detach().squeeze().cpu(), V.detach().squeeze().cpu()  # shape: [num_clients]
 
-    def stgm_high_lora(self, models, lr_meta):
-        """
-        Modified STGM for LoRA adaptation with separate U and V weights.
+    def optimize_conflict_free_uv(self, models):
         
-        Input:
-        - models: List of (model_id, state_dict) tuples from clients
-        - lr_meta: scalar value
-        
-        Output:
-        - Updated global model state dict
-        """
-        # Extract LoRA gradients
-        grad_A_all, grad_B_all = self.extract_lora_AB_gradients(models)
-        
-        # Compute effective gradients V*B @ U*A for each client to get full model size gradients
-        all_domain_grads = []
-        all_A_grads = []
-        all_B_grads = []
-        
-        for i_client in range(len(models)):
-            # Get A and B gradients for this client
-            grad_A_client = grad_A_all[i_client]  # [num_layers, ...]
-            grad_B_client = grad_B_all[i_client]  # [num_layers, ...]
-            
-            # Compute effective gradients B @ A for each layer (original model size)
-            effective_grads = []
-            A_grads_flat = []
-            B_grads_flat = []
-            
-            for layer_idx in range(grad_A_client.shape[0]):
-                # grad_B has shape [out_dim, r], grad_A has shape [r, in_dim]
-                # effective gradient has shape [out_dim, in_dim] (original model layer size)
-                effective_grad = torch.matmul(grad_B_client[layer_idx], grad_A_client[layer_idx])
-                effective_grads.append(effective_grad.flatten())
-                
-                # Also store flattened A and B gradients separately
-                A_grads_flat.append(grad_A_client[layer_idx].flatten())
-                B_grads_flat.append(grad_B_client[layer_idx].flatten())
-            
-            # Concatenate gradients
-            domain_grad_vector = torch.cat(effective_grads)  # Full model size
-            A_grad_vector = torch.cat(A_grads_flat)  # LoRA A size
-            B_grad_vector = torch.cat(B_grads_flat)  # LoRA B size
-            
-            all_domain_grads.append(domain_grad_vector)
-            all_A_grads.append(A_grad_vector)
-            all_B_grads.append(B_grad_vector)
-        
-        # Gradient normalization
-        if self.grad_balance:
-            # Apply balancing
-            # Step 1: Compute norms for each gradient vector
-            domain_grad_norms = [torch.norm(grad) for grad in all_domain_grads]
-            A_grad_norms = [torch.norm(grad) for grad in all_A_grads]
-            B_grad_norms = [torch.norm(grad) for grad in all_B_grads]
-            
-            # Step 2: Determine scaling factors to balance the norms
-            target_norm = torch.mean(torch.tensor(domain_grad_norms))
-            target_norm_A = torch.mean(torch.tensor(A_grad_norms))
-            target_norm_B = torch.mean(torch.tensor(B_grad_norms))
-            
-            scaling_factors = [target_norm / norm if norm > 0 else 1.0 for norm in domain_grad_norms]
-            scaling_factors_A = [target_norm_A / norm if norm > 0 else 1.0 for norm in A_grad_norms]
-            scaling_factors_B = [target_norm_B / norm if norm > 0 else 1.0 for norm in B_grad_norms]
-            
-            # Step 3: Scale gradient vectors
-            balanced_domain_grads = [grad * scale for grad, scale in zip(all_domain_grads, scaling_factors)]
-            balanced_A_grads = [grad * scale for grad, scale in zip(all_A_grads, scaling_factors_A)]
-            balanced_B_grads = [grad * scale for grad, scale in zip(all_B_grads, scaling_factors_B)]
-            
-            # Step 4: Stack the balanced gradients into tensors
-            all_domains_grad_tensor = torch.stack(balanced_domain_grads).t()
-            all_A_grads_tensor = torch.stack(balanced_A_grads).t()
-            all_B_grads_tensor = torch.stack(balanced_B_grads).t()
-        else:
-            all_domains_grad_tensor = torch.stack(all_domain_grads).t()
-            all_A_grads_tensor = torch.stack(all_A_grads).t()
-            all_B_grads_tensor = torch.stack(all_B_grads).t()
-        
-        # Apply STGM with separate U and V optimization
-        g_effective = self.stgm_low_lora(all_domains_grad_tensor, all_A_grads_tensor, all_B_grads_tensor, len(models), grad_A_all, grad_B_all)
-        
-        # Update global model LoRA parameters using the effective gradient
-        self.update_global_lora_parameters_effective(g_effective, lr_meta, grad_A_all, grad_B_all)
-        
-        return self.model.state_dict()
+        CA_lr = self.cfg.federate.FLoRA_CA_lr
+        CA_momentum = self.cfg.federate.FLoRA_CA_momentum
+        CA_step_size = self.cfg.federate.FLoRA_CA_step_size
+        CA_gamma = self.cfg.federate.FLoRA_CA_gamma
+        CA_c = self.cfg.federate.FLoRA_CA_c
+        CA_grad_balance = self.cfg.federate.FLoRA_CA_grad_balance
+        CA_step = self.cfg.federate.FLoRA_CA_step
 
-    def stgm_low_lora(self, grad_effective_vec, grad_A_vec, grad_B_vec, num_clients, grad_A_all, grad_B_all):
-        """
-        Modified STGM low-level optimization with separate U and V weights.
-        The effective gradient is computed as V*B @ U*A to match original model size.
+        # Extract current parameters and gradients
+        grad_A_all, grad_B_all = self.extract_lora_AB_gradients(models)
+
+        # --- Gradient Normalization for A and B ---
+        if CA_grad_balance:
+            balanced_grad_A = []
+            balanced_grad_B = []
+
+            for i in range(grad_A_all.size(0)):  # loop over clients
+                # Flatten A and B grads for this client
+                grad_A_flat = grad_A_all[i].reshape(-1)
+                grad_B_flat = grad_B_all[i].reshape(-1)
+
+                # Compute combined norm
+                grad_norm = torch.norm(torch.cat([grad_A_flat, grad_B_flat]))
+
+                # Target norm = mean across all clients
+                balanced_grad_A.append((grad_A_all[i] / grad_norm).unsqueeze(0))
+                balanced_grad_B.append((grad_B_all[i] / grad_norm).unsqueeze(0))
+
+            balanced_grad_A = torch.cat(balanced_grad_A, dim=0)
+            balanced_grad_B = torch.cat(balanced_grad_B, dim=0)
+
+            # Compute target scaling (mean of all client norms)
+            all_norms = [torch.norm(torch.cat([grad_A_all[i].reshape(-1), 
+                                            grad_B_all[i].reshape(-1)])) 
+                        for i in range(grad_A_all.size(0))]
+            target_norm = torch.mean(torch.stack(all_norms))
+
+            # Rescale each client’s grads to target_norm
+            scaling_factors = [target_norm / n if n > 0 else 1.0 for n in all_norms]
+
+            grad_A_all = torch.stack([g * s for g, s in zip(balanced_grad_A, scaling_factors)])
+            grad_B_all = torch.stack([g * s for g, s in zip(balanced_grad_B, scaling_factors)])
         
-        Args:
-            grad_effective_vec: Effective gradients tensor [grad_dim_full, num_clients] (full model size)
-            grad_A_vec: A gradients tensor [grad_dim_A, num_clients]
-            grad_B_vec: B gradients tensor [grad_dim_B, num_clients] 
-            num_clients: Number of clients
-            grad_A_all: Original A gradients [num_clients, num_layers, ...]
-            grad_B_all: Original B gradients [num_clients, num_layers, ...]
-            
-        Returns:
-            aggregated effective gradient (full model size)
-        """
-        grads_A = grad_A_vec.to(self.device)
-        grads_B = grad_B_vec.to(self.device)
-        grads_effective = grad_effective_vec.to(self.device)
+        # Move to device
+        grad_A_all = grad_A_all.to(self.device)
+        grad_B_all = grad_B_all.to(self.device)
         
+        num_clients = grad_A_all.shape[0]
+
+        # Compute ideal gradient
+        BA = []
+        for i in range(len(grad_A_all)):
+            BA.append(torch.matmul(grad_B_all[i], grad_A_all[i]))
+        ideal_gradient = torch.stack(BA).mean(dim=0)  # [num_layers, ...]
+
         # Initialize U and V weights
         U = torch.nn.Parameter(torch.ones(num_clients, device=self.device))
         V = torch.nn.Parameter(torch.ones(num_clients, device=self.device))
         
         # Setup optimizer for both U and V
-        if num_clients == 50:
-            optimizer = torch.optim.SGD([U, V], lr=self.stgm_learning_rate * 2, momentum=self.stgm_momentum)
-        else:
-            optimizer = torch.optim.SGD([U, V], lr=self.stgm_learning_rate, momentum=self.stgm_momentum)
-        
-        scheduler = StepLR(optimizer, step_size=self.stgm_step_size, gamma=self.stgm_gamma)
-        
+        optimizer = torch.optim.SGD([U, V], lr=CA_lr, momentum=CA_momentum)
+        scheduler = StepLR(optimizer, step_size=CA_step_size, gamma=CA_gamma)
+
+        loss_best = np.inf
         U_best = None
         V_best = None
-        obj_best = np.inf
-        
-        for i in range(self.stgm_rounds + 1):
+
+        for step in range(CA_step + 1):
             optimizer.zero_grad()
             
-            # Apply softmax to get normalized weights
-            uu = torch.softmax(U, dim=0)  # weights for A gradients
-            vv = torch.softmax(V, dim=0)  # weights for B gradients
-            
-            # Compute weighted effective gradients by reconstructing V*B @ U*A
-            weighted_effective_grads = []
-            
-            for client_idx in range(num_clients):
-                # Get individual client gradients
-                client_weighted_effective_grad = []
-                
-                # Reconstruct weighted effective gradient for this client
-                grad_idx_A = 0
-                grad_idx_B = 0
-                
-                for layer_idx in range(grad_A_all.shape[1]):  # num_layers
-                    # Get shapes for this layer
-                    A_layer_shape = grad_A_all[client_idx, layer_idx].shape  # [r, in_dim]
-                    B_layer_shape = grad_B_all[client_idx, layer_idx].shape  # [out_dim, r]
-                    
-                    A_layer_size = A_layer_shape[0] * A_layer_shape[1]
-                    B_layer_size = B_layer_shape[0] * B_layer_shape[1]
-                    
-                    # Extract layer gradients
-                    A_layer_grad = grads_A[grad_idx_A:grad_idx_A + A_layer_size, client_idx].reshape(A_layer_shape)
-                    B_layer_grad = grads_B[grad_idx_B:grad_idx_B + B_layer_size, client_idx].reshape(B_layer_shape)
-                    
-                    # Apply weights and compute effective gradient: V*B @ U*A
-                    weighted_A = A_layer_grad * uu[client_idx]
-                    weighted_B = B_layer_grad * vv[client_idx]
-                    layer_effective_grad = torch.matmul(weighted_B, weighted_A)
-                    
-                    client_weighted_effective_grad.append(layer_effective_grad.flatten())
-                    
-                    grad_idx_A += A_layer_size
-                    grad_idx_B += B_layer_size
-                
-                # Concatenate all layers for this client
-                client_effective_vector = torch.cat(client_weighted_effective_grad)
-                weighted_effective_grads.append(client_effective_vector)
-            
-            # Stack weighted effective gradients
-            combined_grads = torch.stack(weighted_effective_grads).t()  # [grad_dim_full, num_clients]
-            
-            # Compute GG matrix for the combined effective gradients
-            GG = combined_grads.t().mm(combined_grads)  # [num_clients, num_clients]
-            
-            # Normalization
-            scale = (torch.diag(GG) + 1e-4).sqrt().mean()
-            GG = GG / scale.pow(2)
-            Gg = GG.mean(1, keepdims=True)  # [num_clients, 1]
-            gg = Gg.mean(0, keepdims=True)  # [1, 1]
-            
-            # Regularization parameter
-            c = (gg + 1e-4).sqrt() * self.stgm_c
-            
-            # Compute combined weights for objective (average of U and V weights)
-            ww_combined = (uu + vv) / 2  # [num_clients]
-            
-            # Objective function using combined weights
-            obj = ww_combined.t().mm(Gg) + c * (ww_combined.t().mm(GG).mm(ww_combined.unsqueeze(1)) + 1e-4).sqrt()
-            
-            if obj.item() < obj_best:
-                obj_best = obj.item()
-                U_best = U.clone()
-                V_best = V.clone()
-            
-            if i < self.stgm_rounds:
-                obj.backward(retain_graph=True)
+            weighted_grad_A = (U.view(-1, 1, 1, 1) * grad_A_all).mean(dim=0)  # [num_layers, ...]
+            weighted_grad_B = (V.view(-1, 1, 1, 1) * grad_B_all).mean(dim=0)  # [num_layers, ...]
+            achieved_gradient = torch.matmul(weighted_grad_B, weighted_grad_A)
+
+            # Loss: difference between achieved update and ideal update
+            ideal_gradient = ideal_gradient.float() 
+            # ideal_gradient = ideal_gradient / torch.min(ideal_gradient)
+            achieved_gradient = achieved_gradient.float()
+            # achieved_gradient = achieved_gradient / torch.min(ideal_gradient)
+
+            dot_product = torch.dot(ideal_gradient.view(-1), achieved_gradient.view(-1))
+
+            loss = dot_product + CA_c * torch.norm(ideal_gradient) * torch.norm(achieved_gradient)
+
+            if loss.item() < loss_best:
+                loss_best = loss.item()
+                U_best = U.detach().clone()
+                V_best = V.detach().clone()
+            if step < CA_step:
+                loss.backward()
                 optimizer.step()
                 scheduler.step()
-    
-    # Use best weights found to compute final effective gradient
-    uu_best = torch.softmax(U_best, dim=0)
-    vv_best = torch.softmax(V_best, dim=0)
-    
-    # Compute final weighted effective gradients
-    final_weighted_effective_grads = []
-    
-    for client_idx in range(num_clients):
-        client_weighted_effective_grad = []
-        grad_idx_A = 0
-        grad_idx_B = 0
-        
-        for layer_idx in range(grad_A_all.shape[1]):  # num_layers
-            A_layer_shape = grad_A_all[client_idx, layer_idx].shape
-            B_layer_shape = grad_B_all[client_idx, layer_idx].shape
-            
-            A_layer_size = A_layer_shape[0] * A_layer_shape[1]
-            B_layer_size = B_layer_shape[0] * B_layer_shape[1]
-            
-            A_layer_grad = grads_A[grad_idx_A:grad_idx_A + A_layer_size, client_idx].reshape(A_layer_shape)
-            B_layer_grad = grads_B[grad_idx_B:grad_idx_B + B_layer_size, client_idx].reshape(B_layer_shape)
-            
-            # Apply best weights
-            weighted_A = A_layer_grad * uu_best[client_idx]
-            weighted_B = B_layer_grad * vv_best[client_idx]
-            layer_effective_grad = torch.matmul(weighted_B, weighted_A)
-            
-            client_weighted_effective_grad.append(layer_effective_grad.flatten())
-            
-            grad_idx_A += A_layer_size
-            grad_idx_B += B_layer_size
-        
-        client_effective_vector = torch.cat(client_weighted_effective_grad)
-        final_weighted_effective_grads.append(client_effective_vector)
-    
-    final_combined_grads = torch.stack(final_weighted_effective_grads).t()
-    
-    # Compute final aggregated gradient using STGM formula
-    GG_final = final_combined_grads.t().mm(final_combined_grads)
-    scale_final = (torch.diag(GG_final) + 1e-4).sqrt().mean()
-    GG_final = GG_final / scale_final.pow(2)
-    
-    ww_avg = (uu_best + vv_best) / 2
-    gw_norm = (ww_avg.t().mm(GG_final).mm(ww_avg.unsqueeze(1)) + 1e-4).sqrt()
-    c_final = (GG_final.mean() + 1e-4).sqrt() * self.stgm_c
-    lmbda = c_final / (gw_norm + 1e-4)
-    
-    g_effective = ((1 / num_clients + ww_avg * lmbda).view(-1, 1) * final_combined_grads.t()).sum(0) / (1 + self.stgm_c ** 2)
-    
-    return g_effective
 
+            if step % 10 == 0:
+                print(f"Step {step}: Loss = {loss.item()}")
+
+        return None, None
 
     def extract_lora_AB_gradients(self, models):
-        """
-        Extract gradients of LoRA A and B matrices by computing the difference
-        between client models and the global model.
-        
-        Args:
-            models: List of (model_id, state_dict) tuples from clients
-            
-        Returns:
-            tuple: (grad_A_all, grad_B_all) where each is a tensor of shape 
-                [num_clients, num_layers, ...]
-        """
         # Get global model state dict
         global_state_dict = self.model.state_dict()
         
@@ -513,20 +357,12 @@ class ExactClientsAggregator(Aggregator):
                 if name in client_A_dict:
                     grad = client_A_dict[name] - global_A_dict[name]
                     grad_A_list.append(grad)
-                else:
-                    # Handle case where client might not have this parameter
-                    print(f"Warning: {name} not found in client {i}")
-                    grad_A_list.append(torch.zeros_like(global_A_dict[name]))
-            
+
             for name in sorted_B_names:
                 if name in client_B_dict:
                     grad = client_B_dict[name] - global_B_dict[name]
                     grad_B_list.append(grad)
-                else:
-                    # Handle case where client might not have this parameter
-                    print(f"Warning: {name} not found in client {i}")
-                    grad_B_list.append(torch.zeros_like(global_B_dict[name]))
-            
+
             grad_A_all.append(torch.stack(grad_A_list))  # shape: [num_layers, ...]
             grad_B_all.append(torch.stack(grad_B_list))
         
@@ -536,7 +372,6 @@ class ExactClientsAggregator(Aggregator):
         return grad_A_all, grad_B_all
 
     def extract_lora_AB(self, models):
-
         A_all = []
         B_all = []
 

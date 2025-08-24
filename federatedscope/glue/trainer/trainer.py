@@ -216,10 +216,10 @@ class GLUETrainer(GeneralTorchTrainer):
 
 
             # added by me, for LoRA
-            norm_grad_A, norm_grad_B = get_lora_AB_grad_norm(ctx.model)
+            # norm_grad_A, norm_grad_B = get_lora_AB_grad_norm(ctx.model)
             # norm_A, norm_B = get_lora_matrices_norm(ctx.model)
-            print(f"LoRA grad A norm: {norm_grad_A}")
-            print(f"LoRA grad B norm: {norm_grad_B}")
+            # print(f"LoRA grad A norm: {norm_grad_A}")
+            # print(f"LoRA grad B norm: {norm_grad_B}")
             # print(f"LoRA A norm: {norm_A}")
 
             p_before_dict = {}
