@@ -68,11 +68,16 @@ class ExactClientsAggregator(Aggregator):
 
     def _grad_weighted_avg(self, models, recover_fun=None):
         """
-        Compute weighted average of client updates based only on dataset size.
-        Scaling with U, V is already applied inside optimize_exact_uv.
+        Apply Exact LoRA scaling using U, V for each client's gradients,
+        then calculate the weighted average and update the global model.
         """
-        # Extract reweighted gradients from optimize_exact_uv
-        reweighted_gradients = self.optimize_exact_uv(models, lr=1e-2, steps=200)
+        # Extract current parameters and gradients
+        A_all, B_all = self.extract_lora_AB(models)
+        grad_A_all, grad_B_all = self.extract_lora_AB_gradients(models)
+        
+        # Optimize U, V based on gradients to achieve ideal parameter update
+        U, V = self.optimize_exact_uv(models, lr=5e-3, steps=200)
+        a, b = self.optimize_conflict_free_uv(models)
 
         num_clients = len(models)
         training_set_size = sum(sample_size for sample_size, _ in models)
@@ -85,25 +90,44 @@ class ExactClientsAggregator(Aggregator):
         for key in global_state_dict:
             avg_model[key] = global_state_dict[key].clone()
 
-        # Compute weighted average
-        total_weighted_gradients = {k: torch.zeros_like(v) for k, v in global_state_dict.items()}
+        # Compute weighted average of scaled gradients
+        total_weighted_gradients = {}
+        
+        for key in global_state_dict:
+            total_weighted_gradients[key] = torch.zeros_like(global_state_dict[key])
+            
+            for i in range(num_clients):
+                local_sample_size, local_model = models[i]
 
-        for i in range(num_clients):
-            local_sample_size, _ = models[i]
+                if self.cfg.federate.ignore_weight:
+                    weight = 1.0 / num_clients
+                elif self.cfg.federate.use_ss:
+                    weight = 1.0
+                else:
+                    weight = local_sample_size / training_set_size
 
-            if self.cfg.federate.ignore_weight:
-                weight = 1.0 / num_clients
-            elif self.cfg.federate.use_ss:
-                weight = 1.0
-            else:
-                weight = local_sample_size / training_set_size
+                # Compute gradient for this client and parameter
+                if key in local_model:
+                    if not self.cfg.federate.use_ss:
+                        local_param = param2tensor(local_model[key])
+                    else:
+                        local_param = local_model[key]
+                    
+                    # Compute gradient (client_param - global_param)
+                    gradient = local_param - global_state_dict[key]
 
-            for key in total_weighted_gradients:
-                if key in reweighted_gradients[i]:
-                    total_weighted_gradients[key] += reweighted_gradients[i][key] * weight
+                    # Scale gradient with U[i] or V[i] if key contains lora_A or lora_B
+                    scaled_gradient = gradient
+                    if "lora_A" in key:
+                        scaled_gradient = U[i] * gradient
+                    elif "lora_B" in key:
+                        scaled_gradient = V[i] * gradient
 
-        # Secret sharing post-processing
-        for key in total_weighted_gradients:
+                    # Accumulate weighted scaled gradients
+                    total_weighted_gradients[key] += scaled_gradient * weight
+                    # print(total_weighted_gradients[key].device)
+
+            # Secret sharing post-processing for gradients
             if self.cfg.federate.use_ss and recover_fun:
                 total_weighted_gradients[key] = recover_fun(total_weighted_gradients[key])
                 total_weighted_gradients[key] /= training_set_size
@@ -115,72 +139,81 @@ class ExactClientsAggregator(Aggregator):
 
         return avg_model
 
-
-    def optimize_exact_uv(self, models, lr=1e-2, steps=200):
-        """
-        Learn U, V scaling factors to reweight client gradients, 
-        and return reweighted gradients for each client.
-        """
+    def optimize_exact_uv(self, models, lr=5e-3, steps=200):
+ 
         # Extract current parameters and gradients
         A_all, B_all = self.extract_lora_AB(models)
         grad_A_all, grad_B_all = self.extract_lora_AB_gradients(models)
-
+        
         # Move to device
-        A_all, B_all = A_all.to(self.device), B_all.to(self.device)
-        grad_A_all, grad_B_all = grad_A_all.to(self.device), grad_B_all.to(self.device)
+        A_all = A_all.to(self.device)
+        B_all = B_all.to(self.device)
+        grad_A_all = grad_A_all.to(self.device)
+        grad_B_all = grad_B_all.to(self.device)
         
         num_clients = A_all.shape[0]
-
-        # Global model parameters
+        
+        # Get global model's current LoRA parameters
         global_state_dict = self.model.state_dict()
-        global_A = torch.stack([param.detach().clone() for k, param in global_state_dict.items() if "lora_A" in k]).to(self.device)
-        global_B = torch.stack([param.detach().clone() for k, param in global_state_dict.items() if "lora_B" in k]).to(self.device)
-
-        # Compute ideal update (baseline BA)
-        BA = [torch.matmul(B_all[i], A_all[i]) for i in range(num_clients)]
-        ideal_update = torch.stack(BA).mean(dim=0)
-
-        # Trainable scaling parameters
+        global_A_dict = {}
+        global_B_dict = {}
+        
+        for name, param in global_state_dict.items():
+            if "lora_A" in name:
+                global_A_dict[name] = param.detach().clone()
+            elif "lora_B" in name:
+                global_B_dict[name] = param.detach().clone()
+        
+        # Convert to same format as A_all, B_all (sorted order)
+        sorted_A_names = sorted(global_A_dict.keys())
+        sorted_B_names = sorted(global_B_dict.keys())
+        
+        global_A_list = [global_A_dict[name] for name in sorted_A_names]
+        global_B_list = [global_B_dict[name] for name in sorted_B_names]
+        
+        global_A = torch.stack(global_A_list).to(self.device)  # [num_layers, ...]
+        global_B = torch.stack(global_B_list).to(self.device)  # [num_layers, ...]
+        
+        # Compute ideal update from the original optimize_uv objective
+        BA = []
+        for i in range(len(A_all)):
+            BA.append(torch.matmul(B_all[i], A_all[i]))
+        ideal_update = torch.stack(BA).mean(dim=0)  # [num_layers, ...]
+        
+        # Initialize optimization parameters
         U = torch.nn.Parameter(torch.ones(num_clients, device=self.device))
         V = torch.nn.Parameter(torch.ones(num_clients, device=self.device))
+        
         optimizer = torch.optim.AdamW([U, V], lr=lr)
-
+        
         for step in range(steps):
             optimizer.zero_grad()
+            
+            # Apply weighted gradients to global parameters
+            weighted_grad_A = (U.view(-1, 1, 1, 1) * grad_A_all).mean(dim=0)  # [num_layers, ...]
+            weighted_grad_B = (V.view(-1, 1, 1, 1) * grad_B_all).mean(dim=0)  # [num_layers, ...]
+            
+            # Updated parameters after applying weighted gradients
+            updated_A = global_A + weighted_grad_A  # [num_layers, ...]
+            updated_B = global_B + weighted_grad_B  # [num_layers, ...]
+            
+            # Compute the update that would be achieved with these new parameters
+            achieved_update = torch.matmul(updated_B, updated_A)  # [num_layers, ...]
 
-            weighted_grad_A = (U.view(-1, 1, 1, 1) * grad_A_all).mean(dim=0)
-            weighted_grad_B = (V.view(-1, 1, 1, 1) * grad_B_all).mean(dim=0)
+            # Loss: difference between achieved update and ideal update
+            ideal_update = ideal_update.float() 
+            achieved_update = achieved_update.float()
+            diff = (achieved_update - ideal_update) / (torch.min(achieved_update - ideal_update)+ 1e-8)
 
-            updated_A = global_A + weighted_grad_A
-            updated_B = global_B + weighted_grad_B
-
-            achieved_update = torch.matmul(updated_B, updated_A)
-
-            diff = achieved_update - ideal_update
             loss = torch.mean(diff ** 2)
 
             loss.backward()
             optimizer.step()
-
-            if step % 10 == 0:
-                print(f"Step {step}: Loss = {loss.item()}")
-
-        # After optimization, build reweighted gradients for each client
-        reweighted_gradients = []
-        for i in range(num_clients):
-            local_sample_size, local_model = models[i]
-            client_grads = {}
-            for key, param in local_model.items():
-                if key in global_state_dict:
-                    grad = param2tensor(param) - global_state_dict[key]
-                    if "lora_A" in key:
-                        grad = U[i].detach() * grad
-                    elif "lora_B" in key:
-                        grad = V[i].detach() * grad
-                    client_grads[key] = grad.detach().cpu()
-            reweighted_gradients.append(client_grads)
-
-        return reweighted_gradients
+            
+            # if step % 10 == 0:
+            #     print(f"Step {step}: Loss = {loss.item()}")
+        
+        return U.detach().squeeze().cpu(), V.detach().squeeze().cpu()  # shape: [num_clients]
 
     def optimize_conflict_free_uv(self, models):
         
