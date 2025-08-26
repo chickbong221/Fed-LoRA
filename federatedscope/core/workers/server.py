@@ -98,6 +98,14 @@ class Server(BaseServer):
             # put the model to the specified device
             model.to(device)
         # Build aggregator
+
+        # num_layers = sum(1 for _ in model.modules())
+        # print("Number of layers (modules):", num_layers)
+
+        # for name, module in model.named_modules():
+        #     if "lora" not in name:
+        #         print(name, "->", module)
+
         self.aggregator = get_aggregator(self._cfg.federate.method,
                                          model=model,
                                          device=device,
@@ -336,7 +344,7 @@ class Server(BaseServer):
         if self.check_buffer(self.state, min_received_num, check_eval_result):
             if not check_eval_result:
                 # Receiving enough feedback in the training process
-                aggregated_num = self._perform_federated_aggregation()
+                aggregated_num, conflict_free_gradients = self._perform_federated_aggregation()
                 self.state += 1
                 if self.state % self._cfg.eval.freq == 0 and self.state != \
                         self.total_round_num:
@@ -355,7 +363,7 @@ class Server(BaseServer):
                     self.msg_buffer['train'][self.state] = dict()
                     self.staled_msg_buffer.clear()
                     # Start a new training round
-                    self._start_new_training_round(aggregated_num)
+                    self._start_new_training_round(aggregated_num, conflict_free_gradients)
                 else:
                     # Final Evaluate
                     logger.info('Server: Training is finished! Starting '
@@ -481,15 +489,15 @@ class Server(BaseServer):
                 'staleness': staleness,
             }
             # logger.info(f'The staleness is {staleness}')
-            result = aggregator.aggregate(agg_info)
+            result, conflict_free_gradients = aggregator.aggregate(agg_info)
             # Due to lazy load, we merge two state dict
             merged_param = merge_param_dict(model.state_dict().copy(), result)
             model.load_state_dict(merged_param, strict=False)
             aggregator.update(result)
 
-        return aggregated_num
+        return aggregated_num, conflict_free_gradients
 
-    def _start_new_training_round(self, aggregated_num=0):
+    def _start_new_training_round(self, aggregated_num=0, conflict_free_gradients=None):
         """
         The behaviors for starting a new training round
         """
@@ -674,6 +682,20 @@ class Server(BaseServer):
                 What Do We Mean by Generalization in Federated Learning?] \
                 You may want to set it to be False when in evaluation stage
         """
+
+        # model = self.models[0]
+        # for name, module in model.named_modules():
+        #     if "lora" not in name:
+        #         print(name, "->", module)
+
+        # num_layers = sum(1 for _ in model.modules())
+        # print("Number of layers (modules):", num_layers)
+
+        # model_dict = model.state_dict()
+        # for name in model_dict.keys():
+        #     if "lora" not in name:
+        #         print(name)
+
         if filter_unseen_clients:
             # to filter out the unseen clients when sampling
             self.sampler.change_state(self.unseen_clients_id, 'unseen')
@@ -714,6 +736,12 @@ class Server(BaseServer):
                 model_para = {} if skip_broadcast else self.models[
                     0].state_dict()
 
+        # print(len(model_para.keys()))
+
+        # for name in model_para.keys():
+        #     if "lora" not in name:
+        #         print(name)
+        
         # quantization
         if msg_type == 'model_para' and not skip_broadcast and \
                 self._cfg.quantization.method == 'uniform':
