@@ -1,4 +1,4 @@
-# FedSA-LoRA
+# FedLoRA-NA/CA
 
 ## Installation
 
