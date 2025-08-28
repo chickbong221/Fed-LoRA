@@ -306,6 +306,12 @@ class GeneralTorchTrainer(Trainer):
         else:
             ctx.get("{}_loader".format(ctx.cur_split)).reset()
 
+        # for name, param in self.ctx.model.named_parameters():
+        #         if "lora_A" in name or "lora_B" in name:
+        #             logger.info(f"name: {name}")
+        #             logger.info(f"params: {param}")
+        #             break
+
     def _hook_on_batch_start_init(self, ctx):
         """
         Note:

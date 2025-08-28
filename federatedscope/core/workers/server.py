@@ -98,14 +98,6 @@ class Server(BaseServer):
             # put the model to the specified device
             model.to(device)
         # Build aggregator
-
-        # num_layers = sum(1 for _ in model.modules())
-        # print("Number of layers (modules):", num_layers)
-
-        # for name, module in model.named_modules():
-        #     if "lora" not in name:
-        #         print(name, "->", module)
-
         self.aggregator = get_aggregator(self._cfg.federate.method,
                                          model=model,
                                          device=device,
@@ -520,7 +512,8 @@ class Server(BaseServer):
                 self.dropout_num = 0
         else:  # for synchronous training
             self.broadcast_model_para(msg_type='model_para',
-                                      sample_client_num=self.sample_client_num)
+                                      sample_client_num=self.sample_client_num,
+                                      additional_info=conflict_free_gradients)
 
     def _merge_and_format_eval_results(self):
         """
@@ -666,7 +659,8 @@ class Server(BaseServer):
     def broadcast_model_para(self,
                              msg_type='model_para',
                              sample_client_num=-1,
-                             filter_unseen_clients=True):
+                             filter_unseen_clients=True,
+                             additional_info=None):
         """
         To broadcast the message to all clients or sampled clients
 
@@ -682,19 +676,6 @@ class Server(BaseServer):
                 What Do We Mean by Generalization in Federated Learning?] \
                 You may want to set it to be False when in evaluation stage
         """
-
-        # model = self.models[0]
-        # for name, module in model.named_modules():
-        #     if "lora" not in name:
-        #         print(name, "->", module)
-
-        # num_layers = sum(1 for _ in model.modules())
-        # print("Number of layers (modules):", num_layers)
-
-        # model_dict = model.state_dict()
-        # for name in model_dict.keys():
-        #     if "lora" not in name:
-        #         print(name)
 
         if filter_unseen_clients:
             # to filter out the unseen clients when sampling
@@ -736,9 +717,8 @@ class Server(BaseServer):
                 model_para = {} if skip_broadcast else self.models[
                     0].state_dict()
 
-        # print(len(model_para.keys()))
-
-        # for name in model_para.keys():
+        # model_dict_full = self.models[0].state_dict(return_trainable=False)
+        # for name in model_dict_full.keys():
         #     if "lora" not in name:
         #         print(name)
         

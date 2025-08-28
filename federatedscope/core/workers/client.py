@@ -326,6 +326,24 @@ class Client(BaseClient):
                     content[k] = v.to(self.device)
             self.trainer.update(content,
                                 strict=self._cfg.federate.share_local_model)
+
+            def merge_and_reset_lora(model):
+                import torch.nn as nn
+
+                for name, module in model.named_modules():
+                    if hasattr(module, "lora_A") and hasattr(module, "lora_B"):
+                        A = module.lora_A["default"].weight.data
+                        B = module.lora_B["default"].weight.data
+                        scaling = module.scaling["default"] if hasattr(module, "scaling") else 1.0
+
+                        delta_w = (B @ A) * scaling
+                        module.base_layer.weight.data += delta_w
+
+                        nn.init.normal_(module.lora_A["default"].weight, mean=0.0, std=0.005)
+                        nn.init.normal_(module.lora_B["default"].weight, mean=0.0, std=0.005)
+
+            merge_and_reset_lora(self.trainer.ctx.model)
+
             self.state = round
             skip_train_isolated_or_global_mode = \
                 self.early_stopper.early_stopped and \

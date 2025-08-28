@@ -79,29 +79,20 @@ def enable_adapter(model, package, adapter, **kwargs):
             import torch.nn as nn
 
             count = 0
-            for _, module in model.named_modules():
-                if hasattr(module, "lora_A") and hasattr(module, "lora_B"):
-                    if isinstance(module.lora_A, nn.ModuleDict):
-                        for sub in module.lora_A.values():
-                            if hasattr(sub, "weight"):
-                                nn.init.normal_(sub.weight, mean=0.0, std=0.02)
-                                count += 1
-                        for sub in module.lora_B.values():
-                            if hasattr(sub, "weight"):
-                                nn.init.normal_(sub.weight, mean=0.0, std=0.02)
-                    else:
-                        if hasattr(module.lora_A, "weight"):
-                            nn.init.normal_(module.lora_A.weight, mean=0.0, std=0.02)
-                            count += 1
-                        if hasattr(module.lora_B, "weight"):
-                            nn.init.normal_(module.lora_B.weight, mean=0.0, std=0.02)
-            
+            for name, param in model.named_parameters():
+                if "lora_A" in name or "lora_B" in name:
+                    nn.init.normal_(param, mean=0.0, std=0.02)
+                    count += 1
+            # print(f"Reset {count} LoRA matrices.")
+
         from peft import get_peft_model, TaskType
         if adapter == 'lora':
             from peft import LoraConfig
             peft_config = LoraConfig(task_type=TaskType.SEQ_CLS, **kwargs)
             model = get_peft_model(model, peft_config)
             reset_lora_A_B_random(model)
+
+            # print(model.state_dict().keys())
 
             # model_toy1 = copy.deepcopy(model)
             # model_toy2 = copy.deepcopy(model)

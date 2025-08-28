@@ -297,8 +297,8 @@ class ExactClientsAggregator(Aggregator):
                 optimizer.step()
                 scheduler.step()
 
-            if step % 10 == 0:
-                print(f"Step {step}: Loss = {loss.item()}")
+            # if step % 10 == 0:
+            #     print(f"Step {step}: Loss = {loss.item()}")
 
         # --- Apply best U and V to client gradients ---
         reweighted_gradients = []
