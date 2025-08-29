@@ -480,8 +480,13 @@ class Server(BaseServer):
                 'recover_fun': self.recover_fun,
                 'staleness': staleness,
             }
-            # logger.info(f'The staleness is {staleness}')
-            result, conflict_free_gradients = aggregator.aggregate(agg_info)
+            # logger.info(f'The staleness is {staleness}'
+
+            if self._cfg.federate.FLoRA_CA_use:
+                result, conflict_free_gradients = aggregator.aggregate(agg_info)
+            else:
+                result = aggregator.aggregate(agg_info)
+
             # Due to lazy load, we merge two state dict
             merged_param = merge_param_dict(model.state_dict().copy(), result)
             model.load_state_dict(merged_param, strict=False)
