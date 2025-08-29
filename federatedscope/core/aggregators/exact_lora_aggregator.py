@@ -73,7 +73,10 @@ class ExactClientsAggregator(Aggregator):
         """
         # Extract exact gradients from optimize_exact_uv
         exact_gradients = self.optimize_exact_uv(models)
-        conflict_free_gradients = self.optimize_conflict_free_uv(models)
+        if self.cfg.federate.FLoRA_CA_use:
+            conflict_free_gradients = self.optimize_conflict_free_uv(models)
+        else: 
+            conflict_free_gradients = None
 
         num_clients = len(models)
         training_set_size = sum(sample_size for sample_size, _ in models)
