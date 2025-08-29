@@ -77,6 +77,7 @@ class ExactClientsAggregator(Aggregator):
         exact_gradients = self.optimize_exact_uv(models)
         if self.cfg.federate.FLoRA_CA_use:
             conflict_free_gradients = self.optimize_conflict_free_uv(models)
+            print("ahihi")
         else: 
             conflict_free_gradients = None
 
