@@ -492,7 +492,9 @@ class Server(BaseServer):
             model.load_state_dict(merged_param, strict=False)
             aggregator.update(result)
 
-        return aggregated_num, conflict_free_gradients
+        if self._cfg.federate.FLoRA_CA_use:
+            return aggregated_num, conflict_free_gradients
+        return aggregated_num, None
 
     def _start_new_training_round(self, aggregated_num=0, conflict_free_gradients=None):
         """
