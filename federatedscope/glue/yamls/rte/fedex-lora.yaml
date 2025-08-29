@@ -11,6 +11,7 @@ federate:
   save_to: "fedsa-lora_mnli-m.ckpt"
   online_aggr: False
   method: 'exact_lora'
+  FLoRA_CA_use: False
   FLoRA_CA_step: 100
   FLoRA_CA_lr: 25
   FLoRA_CA_momentum: 0.5

@@ -59,6 +59,7 @@ def extend_fl_setting_cfg(cfg):
     cfg.federate.atc_load_from = ''
 
     # FLoRA_CA
+    cfg.federate.FLoRA_CA_use = False
     cfg.federate.FLoRA_CA_step = 100
     cfg.federate.FLoRA_CA_lr = 25
     cfg.federate.FLoRA_CA_momentum = 0.5

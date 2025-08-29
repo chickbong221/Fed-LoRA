@@ -358,7 +358,7 @@ class Client(BaseClient):
                             # update the global base weight
                             module.base_layer.weight.data += delta_w
 
-            if round > 0:
+            if round > 0 and self._cfg.federate.FLoRA_CA_use:
                 merge_and_reset_lora(self.trainer.ctx.model, additional_info)
 
             self.state = round
