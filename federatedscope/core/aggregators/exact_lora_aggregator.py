@@ -40,7 +40,9 @@ class ExactClientsAggregator(Aggregator):
 
         avg_model, conflict_free_gradients = self._grad_weighted_avg(models, recover_fun=recover_fun)
 
-        return avg_model, conflict_free_gradients
+        if self.cfg.federate.FLoRA_CA_use:
+            return avg_model, conflict_free_gradients
+        return avg_model
 
     def update(self, model_parameters):
         """
