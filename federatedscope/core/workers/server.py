@@ -749,7 +749,8 @@ class Server(BaseServer):
                     receiver=receiver,
                     state=min(rnd, self.total_round_num),
                     timestamp=self.cur_timestamp,
-                    content=model_para))
+                    content=model_para,
+                    additional_info=additional_info))
         if self._cfg.federate.online_aggr:
             for idx in range(self.model_num):
                 self.aggregators[idx].reset()

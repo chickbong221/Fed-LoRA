@@ -26,7 +26,8 @@ class Message(object):
                  content='None',
                  timestamp=0,
                  strategy=None,
-                 serial_num=0):
+                 serial_num=0,
+                 additional_info=None):
         self._msg_type = msg_type
         self._sender = sender
         self._receiver = receiver
@@ -36,6 +37,7 @@ class Message(object):
         self._strategy = strategy
         self.serial_num = serial_num
         self.param_serializer = b64serializer
+        self.additional_info = additional_info
 
     @property
     def msg_type(self):

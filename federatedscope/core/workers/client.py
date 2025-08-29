@@ -305,6 +305,7 @@ class Client(BaseClient):
             sender = message.sender
             timestamp = message.timestamp
             content = message.content
+            additional_info = message.additional_info
 
             # dequantization
             if self._cfg.quantization.method == 'uniform':
@@ -327,8 +328,8 @@ class Client(BaseClient):
             self.trainer.update(content,
                                 strict=self._cfg.federate.share_local_model)
 
-            def merge_and_reset_lora(model):
-                import torch.nn as nn
+            def merge_and_reset_lora(model, additional_info):
+                CA_c = self._cfg.federate.FLoRA_CA_c
 
                 for name, module in model.named_modules():
                     if hasattr(module, "lora_A") and hasattr(module, "lora_B"):
@@ -336,13 +337,29 @@ class Client(BaseClient):
                         B = module.lora_B["default"].weight.data
                         scaling = module.scaling["default"] if hasattr(module, "scaling") else 1.0
 
-                        delta_w = (B @ A) * scaling
-                        module.base_layer.weight.data += delta_w
+                        # Extract averaged gradients from additional_info
+                        A_grad, B_grad = None, None
+                        for key, grad in additional_info.items():
+                            if "lora_A" in key and name in key:
+                                A_grad = grad.to(A.device)
+                            elif "lora_B" in key and name in key:
+                                B_grad = grad.to(B.device)
 
-                        nn.init.normal_(module.lora_A["default"].weight, mean=0.0, std=0.005)
-                        nn.init.normal_(module.lora_B["default"].weight, mean=0.0, std=0.005)
+                        if A_grad is not None and B_grad is not None:
+                            A_from_additional_info = A_grad
+                            B_from_additional_info = B_grad
 
-            merge_and_reset_lora(self.trainer.ctx.model)
+                            # compute delta_w
+                            numerator = torch.norm(B @ A)
+                            denominator = torch.norm(B_from_additional_info @ A_from_additional_info) + 1e-8  # avoid div/0
+
+                            delta_w = CA_c * numerator / denominator * (B_from_additional_info @ A_from_additional_info)
+
+                            # update the global base weight
+                            module.base_layer.weight.data += delta_w
+
+            if round > 0:
+                merge_and_reset_lora(self.trainer.ctx.model, additional_info)
 
             self.state = round
             skip_train_isolated_or_global_mode = \

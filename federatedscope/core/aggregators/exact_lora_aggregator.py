@@ -317,7 +317,13 @@ class ExactClientsAggregator(Aggregator):
                     client_grads[key] = grad.detach().cpu()
             reweighted_gradients.append(client_grads)
 
-        return reweighted_gradients
+        # ---- compute mean across clients ----
+        mean_gradients = {}
+        for key in reweighted_gradients[0].keys():
+            grads = [client_grads[key] for client_grads in reweighted_gradients]
+            mean_gradients[key] = sum(grads) / len(grads)
+
+        return mean_gradients
 
     def extract_lora_AB_gradients(self, models):
         # Get global model state dict
