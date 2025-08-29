@@ -197,8 +197,8 @@ class ExactClientsAggregator(Aggregator):
                 optimizer.step()
                 scheduler.step()
 
-            # if step % 20 == 0:
-            #     print(f"Step {step}: Loss = {loss.item()}")
+            if step % 20 == 0:
+                print(f"Step {step}: Loss = {loss.item()}")
 
         # After optimization, build reweighted gradients for each client
         reweighted_gradients = []
