@@ -185,7 +185,7 @@ class ExactClientsAggregator(Aggregator):
 
             ideal_update = ideal_update.float() 
             achieved_update = achieved_update.float()
-            diff = (achieved_update - ideal_update) / (torch.min(achieved_update - ideal_update)+ 1e-8)*100
+            diff = (achieved_update - ideal_update) / (torch.min(achieved_update - ideal_update)+ 1e-8)
             loss = torch.mean(diff ** 2)
 
             if loss.item() < loss_best:
@@ -200,6 +200,11 @@ class ExactClientsAggregator(Aggregator):
 
             if step % 20 == 0:
                 print(f"Step {step}: Loss = {loss.item()}")
+            if step == 0 and self.cfg.use_wandb:
+                wandb.log({"Exact_UV_Opt_Loss_begin": loss.item()})
+            
+            if step == steps and self.cfg.use_wandb:
+                wandb.log({"Exact_UV_Opt_Loss_last": loss.item()})
 
         # After optimization, build reweighted gradients for each client
         reweighted_gradients = []

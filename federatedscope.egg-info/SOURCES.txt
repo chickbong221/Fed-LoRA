@@ -41,10 +41,6 @@ federatedscope/autotune/hpbandster.py
 federatedscope/autotune/run.py
 federatedscope/autotune/smac.py
 federatedscope/autotune/utils.py
-federatedscope/autotune/fedex/__init__.py
-federatedscope/autotune/fedex/client.py
-federatedscope/autotune/fedex/server.py
-federatedscope/autotune/fedex/utils.py
 federatedscope/autotune/fts/__init__.py
 federatedscope/autotune/fts/client.py
 federatedscope/autotune/fts/server.py
@@ -110,6 +106,9 @@ federatedscope/core/aggregators/aggregator.py
 federatedscope/core/aggregators/asyn_clients_avg_aggregator.py
 federatedscope/core/aggregators/bulyan_aggregator.py
 federatedscope/core/aggregators/clients_avg_aggregator.py
+federatedscope/core/aggregators/exact_lora_aggregator.py
+federatedscope/core/aggregators/exact_lora_aggregator1.py
+federatedscope/core/aggregators/exact_lora_aggregator_backup.py
 federatedscope/core/aggregators/fedopt_aggregator.py
 federatedscope/core/aggregators/krum_aggregator.py
 federatedscope/core/aggregators/median_aggregator.py

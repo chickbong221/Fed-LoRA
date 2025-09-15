@@ -6,7 +6,7 @@ early_stop:
 federate:
   freeze_A: False
   mode: standalone
-  client_num: 10
+  client_num: 3
   total_round_num: 600
   save_to: "fedsa-lora_mnli-m.ckpt"
   online_aggr: False
