@@ -8,6 +8,7 @@ import numpy as np
 from federatedscope.core.aggregators import Aggregator
 from federatedscope.core.auxiliaries.utils import param2tensor
 from torch.optim.lr_scheduler import StepLR
+import wandb
 
 
 # TODO 1. Fix all of the value names of FedAvg -> FedExAgg
@@ -22,6 +23,7 @@ class ExactClientsAggregator(Aggregator):
         self.model = model
         self.device = device
         self.cfg = config
+        self.use_wandb = config.wandb.use
 
     def aggregate(self, agg_info):
         """
@@ -37,8 +39,9 @@ class ExactClientsAggregator(Aggregator):
         models = agg_info["client_feedback"]
         recover_fun = agg_info['recover_fun'] if (
             'recover_fun' in agg_info and self.cfg.federate.use_ss) else None
+        state = agg_info['state']
 
-        avg_model, conflict_free_gradients = self._grad_weighted_avg(models, recover_fun=recover_fun)
+        avg_model, conflict_free_gradients = self._grad_weighted_avg(models, recover_fun=recover_fun, state=state)
 
         if self.cfg.federate.FLoRA_CA_use:
             return avg_model, conflict_free_gradients
@@ -68,13 +71,13 @@ class ExactClientsAggregator(Aggregator):
         else:
             raise ValueError("The file {} does NOT exist".format(path))
 
-    def _grad_weighted_avg(self, models, recover_fun=None):
+    def _grad_weighted_avg(self, models, recover_fun=None, state=None):
         """
         Compute weighted average of client updates based only on dataset size.
         Scaling with U, V is already applied inside optimize_exact_uv.
         """
         # Extract exact gradients from optimize_exact_uv
-        exact_gradients = self.optimize_exact_uv(models)
+        exact_gradients = self.optimize_exact_uv(models, state=state)
         if self.cfg.federate.FLoRA_CA_use:
             conflict_free_gradients = self.optimize_conflict_free_uv(models)
             print("ahihi")
@@ -123,7 +126,7 @@ class ExactClientsAggregator(Aggregator):
         return avg_model, conflict_free_gradients
 
 
-    def optimize_exact_uv(self, models, lr=1e-2, steps=200):
+    def optimize_exact_uv(self, models, lr=1e-2, steps=200, state=None):
         """
         Learn U, V scaling factors to reweight client gradients, 
         and return reweighted gradients for each client.
@@ -200,11 +203,11 @@ class ExactClientsAggregator(Aggregator):
 
             if step % 20 == 0:
                 print(f"Step {step}: Loss = {loss.item()}")
-            if step == 0 and self.cfg.use_wandb:
-                wandb.log({"Exact_UV_Opt_Loss_begin": loss.item()})
-            
-            if step == steps and self.cfg.use_wandb:
-                wandb.log({"Exact_UV_Opt_Loss_last": loss.item()})
+            if step == 0 and self.use_wandb:
+                wandb.log({"Exact_UV_Opt_Loss_begin": loss.item()}, step=state)
+
+            if step == steps and self.use_wandb:
+                wandb.log({"Exact_UV_Opt_Loss_last": loss.item()}, step=state)
 
         # After optimization, build reweighted gradients for each client
         reweighted_gradients = []

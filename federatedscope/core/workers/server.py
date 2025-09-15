@@ -479,6 +479,7 @@ class Server(BaseServer):
                 'client_feedback': msg_list,
                 'recover_fun': self.recover_fun,
                 'staleness': staleness,
+                'state': self.state,
             }
             # logger.info(f'The staleness is {staleness}'
 
