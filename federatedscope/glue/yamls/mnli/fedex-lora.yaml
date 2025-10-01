@@ -6,11 +6,19 @@ early_stop:
 federate:
   freeze_A: False
   mode: standalone
-  client_num: 10
+  client_num: 3
   total_round_num: 600
   save_to: "fedsa-lora_mnli-m.ckpt"
   online_aggr: False
   method: 'exact_lora'
+  FLoRA_CA_use: False
+  FLoRA_CA_step: 100
+  FLoRA_CA_lr: 25
+  FLoRA_CA_momentum: 0.5
+  FLoRA_CA_step_size: 30
+  FLoRA_CA_gamma: 0.5
+  FLoRA_CA_c: 0.25
+  FLoRA_CA_grad_balance: True
 personalization: 
   local_param: []
 data:
@@ -31,7 +39,7 @@ dataloader:
 model:
   type: 'FacebookAI/roberta-large@huggingface_llm'
 train:
-  local_update_steps: 10
+  local_update_steps: 5
   batch_or_epoch: batch
   optimizer:
     lr: 2e-2

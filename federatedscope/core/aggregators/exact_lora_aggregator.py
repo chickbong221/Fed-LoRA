@@ -9,6 +9,7 @@ from federatedscope.core.aggregators import Aggregator
 from federatedscope.core.auxiliaries.utils import param2tensor
 from torch.optim.lr_scheduler import StepLR
 import wandb
+import time
 
 
 # TODO 1. Fix all of the value names of FedAvg -> FedExAgg
@@ -370,6 +371,7 @@ class ExactClientsAggregator(Aggregator):
             for name, param in client_state_dict.items():
                 if "lora_A" in name:
                     client_A_dict[name] = param.detach().clone()
+                    # print(f"{name}: shape={param.shape}")
                 elif "lora_B" in name:
                     client_B_dict[name] = param.detach().clone()
             

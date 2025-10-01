@@ -16,7 +16,7 @@ pip install -e .[llm]
 Now, we can fine-tune a LLM with FedSA-LoRA:
 
 ```shell
-python federatedscope/main.py --cfg federatedscope/glue/yamls/rte/fedsa-lora.yaml
+python federatedscope/main.py --cfg federatedscope/glue/yamls/rte/fedex-lora.yaml
 bash federatedscope/glue/yamls/qnli/qnli_sweep.sh
 ```
 
