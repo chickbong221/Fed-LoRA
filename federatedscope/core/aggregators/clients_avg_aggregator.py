@@ -73,6 +73,7 @@ class ClientsAvgAggregator(Aggregator):
                 B_list = []
 
                 for name, param in state_dict.items():
+                    print(name)
                     if "lora_A" in name:
                         # print(f"Extracting {name} with shape {param}")
                         A_list.append(param.detach().clone())
@@ -98,12 +99,17 @@ class ClientsAvgAggregator(Aggregator):
         # value = B_all_copy[0].norm(p=2).item()
         # print(f"{value:.10f}")
 
+        import math
+
+        NOISE_STD = math.sqrt(0)
+
         training_set_size = 0
         for i in range(len(models)):
             sample_size, _ = models[i]
             training_set_size += sample_size
 
         sample_size, avg_model = models[0]
+        
         for key in avg_model:
             for i in range(len(models)):
                 local_sample_size, local_model = models[i]
@@ -111,23 +117,30 @@ class ClientsAvgAggregator(Aggregator):
                 if self.cfg.federate.ignore_weight:
                     weight = 1.0 / len(models)
                 elif self.cfg.federate.use_ss:
-                    # When using secret sharing, what the server receives
-                    # are sample_size * model_para
                     weight = 1.0
                 else:
                     weight = local_sample_size / training_set_size
 
                 if not self.cfg.federate.use_ss:
-                    local_model[key] = param2tensor(local_model[key])
-                if i == 0:
-                    avg_model[key] = local_model[key] * weight
+                    local_param = param2tensor(local_model[key])
                 else:
-                    avg_model[key] += local_model[key] * weight
+                    local_param = local_model[key]
+
+                # --------------------------------------------------------
+                # Add Gaussian noise ONLY to LoRA A/B parameters
+                # --------------------------------------------------------
+                if "lora_A" in key or "lora_B" in key:
+                    noise = torch.randn_like(local_param) * NOISE_STD
+                    local_param = local_param + noise
+                # --------------------------------------------------------
+
+                if i == 0:
+                    avg_model[key] = local_param * weight
+                else:
+                    avg_model[key] += local_param * weight
 
             if self.cfg.federate.use_ss and recover_fun:
                 avg_model[key] = recover_fun(avg_model[key])
-                # When using secret sharing, what the server receives are
-                # sample_size * model_para
                 avg_model[key] /= training_set_size
                 avg_model[key] = torch.FloatTensor(avg_model[key])
 
