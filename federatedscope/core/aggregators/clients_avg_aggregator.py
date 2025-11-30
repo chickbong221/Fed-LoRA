@@ -99,17 +99,12 @@ class ClientsAvgAggregator(Aggregator):
         # value = B_all_copy[0].norm(p=2).item()
         # print(f"{value:.10f}")
 
-        import math
-
-        NOISE_STD = math.sqrt(0)
-
         training_set_size = 0
         for i in range(len(models)):
             sample_size, _ = models[i]
             training_set_size += sample_size
 
         sample_size, avg_model = models[0]
-        
         for key in avg_model:
             for i in range(len(models)):
                 local_sample_size, local_model = models[i]
@@ -117,38 +112,25 @@ class ClientsAvgAggregator(Aggregator):
                 if self.cfg.federate.ignore_weight:
                     weight = 1.0 / len(models)
                 elif self.cfg.federate.use_ss:
+                    # When using secret sharing, what the server receives
+                    # are sample_size * model_para
                     weight = 1.0
                 else:
                     weight = local_sample_size / training_set_size
 
                 if not self.cfg.federate.use_ss:
-                    local_param = param2tensor(local_model[key])
-                else:
-                    local_param = local_model[key]
-
-                # --------------------------------------------------------
-                # Add Gaussian noise ONLY to LoRA A/B parameters
-                # --------------------------------------------------------
-                if "lora_A" in key or "lora_B" in key:
-                    # Always detach from autograd
-                    local_param = param2tensor(local_model[key]).cpu().detach()
-
-                    with torch.no_grad():
-                        noise = torch.randn(local_param.size()) * NOISE_STD
-                        local_param.add_(noise)
-                # --------------------------------------------------------
-
+                    local_model[key] = param2tensor(local_model[key])
                 if i == 0:
-                    avg_model[key] = local_param * weight
+                    avg_model[key] = local_model[key] * weight
                 else:
-                    avg_model[key] += local_param * weight
+                    avg_model[key] += local_model[key] * weight
 
             if self.cfg.federate.use_ss and recover_fun:
                 avg_model[key] = recover_fun(avg_model[key])
+                # When using secret sharing, what the server receives are
+                # sample_size * model_para
                 avg_model[key] /= training_set_size
                 avg_model[key] = torch.FloatTensor(avg_model[key])
-            
-            avg_model[key] = avg_model[key].to(self.device)
 
         return avg_model
 
