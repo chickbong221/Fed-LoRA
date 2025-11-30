@@ -130,8 +130,12 @@ class ClientsAvgAggregator(Aggregator):
                 # Add Gaussian noise ONLY to LoRA A/B parameters
                 # --------------------------------------------------------
                 if "lora_A" in key or "lora_B" in key:
-                    noise = torch.randn_like(local_param) * NOISE_STD
-                    local_param = local_param + noise
+                    # Always detach from autograd
+                    local_param = param2tensor(local_model[key]).cpu().detach()
+
+                    with torch.no_grad():
+                        noise = torch.randn(local_param.size()) * NOISE_STD
+                        local_param.add_(noise)
                 # --------------------------------------------------------
 
                 if i == 0:
@@ -143,6 +147,8 @@ class ClientsAvgAggregator(Aggregator):
                 avg_model[key] = recover_fun(avg_model[key])
                 avg_model[key] /= training_set_size
                 avg_model[key] = torch.FloatTensor(avg_model[key])
+            
+            avg_model[key] = avg_model[key].to(self.device)
 
         return avg_model
 
