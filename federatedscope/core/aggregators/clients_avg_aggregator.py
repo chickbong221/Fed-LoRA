@@ -99,17 +99,13 @@ class ClientsAvgAggregator(Aggregator):
         # value = B_all_copy[0].norm(p=2).item()
         # print(f"{value:.10f}")
 
-        NOISE_STD = 0.1   # sqrt(0.1)
-
         training_set_size = 0
         for i in range(len(models)):
             sample_size, _ = models[i]
             training_set_size += sample_size
 
         sample_size, avg_model = models[0]
-
         for key in avg_model:
-            # ---------- Weighted Summation ----------
             for i in range(len(models)):
                 local_sample_size, local_model = models[i]
 
@@ -124,45 +120,17 @@ class ClientsAvgAggregator(Aggregator):
 
                 if not self.cfg.federate.use_ss:
                     local_model[key] = param2tensor(local_model[key])
-
                 if i == 0:
-                    avg_model[key] = local_model[key] * weight
                     avg_model[key] = local_model[key] * weight
                 else:
                     avg_model[key] += local_model[key] * weight
-                    avg_model[key] += local_model[key] * weight
 
-            # ---------- Secret Sharing ----------
             if self.cfg.federate.use_ss and recover_fun:
                 avg_model[key] = recover_fun(avg_model[key])
                 # When using secret sharing, what the server receives are
                 # sample_size * model_para
                 avg_model[key] /= training_set_size
                 avg_model[key] = torch.FloatTensor(avg_model[key])
-
-            # ---------- Add Gaussian Noise AFTER aggregation ----------
-            if ("lora_A" in key) or ("lora_B" in key):
-                with torch.no_grad():
-                    param = avg_model[key]
-
-                    # Save device but DO NOT bring param back to GPU yet
-                    device = param.device
-
-                    # Move to CPU (freed from GPU)
-                    cpu_param = param.detach().to("cpu")
-
-                    # Create noise on CPU
-                    noise = torch.randn(cpu_param.shape, dtype=cpu_param.dtype) * NOISE_STD
-
-                    # Add noise inplace
-                    cpu_param.add_(noise)
-
-                    # DO NOT use .to(device) → it allocates new GPU memory!
-                    # Instead, overwrite GPU tensor directly using .data
-                    param.data = cpu_param.to(device)
-
-                    # cleanup
-                    del cpu_param, noise
 
         return avg_model
 
