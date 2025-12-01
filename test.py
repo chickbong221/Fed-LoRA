@@ -11,12 +11,13 @@ import numpy as np
 from typing import List, Dict
 import copy
 import os
+import random
 
 # Configuration
 class Config:
     num_clients = 10
-    num_rounds = 300
-    local_epochs = 5
+    num_rounds = 100
+    local_epochs = 10
     batch_size = 128
     learning_rate = 1e-3
     lora_r = 8
@@ -26,6 +27,17 @@ class Config:
     dirichlet_alpha = 0.5  # Dirichlet concentration parameter for non-IID split
     wandb_project = "federated-vit-lora-cifar100"
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    seed = 42  # Random seed for reproducibility
+
+def set_seed(seed):
+    """Set random seed for reproducibility"""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 # Data preprocessing
 transform_train = transforms.Compose([
@@ -152,7 +164,7 @@ class Client:
         self.noise_variance = noise_variance
         self.config = config
         self.dataloader = DataLoader(
-            dataset, batch_size=config.batch_size, shuffle=True, pin_memory=True,
+            dataset, batch_size=config.batch_size, shuffle=True
         )
         self.model = None
     
@@ -320,6 +332,10 @@ def run_experiment(noise_variance):
     config = Config()
     config.noise_variance = noise_variance
     
+    # Set seed for reproducibility
+    set_seed(config.seed)
+    print(f"Random seed set to: {config.seed}")
+    
     # Initialize W&B with unique run name
     wandb.init(
         project=config.wandb_project,
@@ -334,6 +350,7 @@ def run_experiment(noise_variance):
             "lora_alpha": config.lora_alpha,
             "noise_variance": config.noise_variance,
             "dirichlet_alpha": config.dirichlet_alpha,
+            "seed": config.seed,
         },
         reinit=True
     )
@@ -364,7 +381,7 @@ def run_experiment(noise_variance):
 # Run federated learning with different noise levels
 if __name__ == "__main__":
     # Different noise variances to test
-    noise_levels = [0.001]
+    noise_levels = [0.1]
     
     for noise_var in noise_levels:
         run_experiment(noise_var)
